@@ -9,8 +9,8 @@ using udemy_vega_aspnetcore_spa.Persistance;
 namespace udemy_vega_aspnetcore_spa.Migrations
 {
     [DbContext(typeof(UdemyVegaDbContext))]
-    [Migration("20200328190517_InitialModel")]
-    partial class InitialModel
+    [Migration("20200328193053_InitialModelWithConstraints")]
+    partial class InitialModelWithConstraints
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,7 +28,9 @@ namespace udemy_vega_aspnetcore_spa.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
 
                     b.HasKey("Id");
 
@@ -46,13 +48,15 @@ namespace udemy_vega_aspnetcore_spa.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
 
                     b.HasKey("Id");
 
                     b.HasIndex("MakeId");
 
-                    b.ToTable("Model");
+                    b.ToTable("Models");
                 });
 
             modelBuilder.Entity("udemy_vega_aspnetcore_spa.Models.Model", b =>
