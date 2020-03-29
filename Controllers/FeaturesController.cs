@@ -4,27 +4,26 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using udemy_vega_aspnetcore_spa.ApiDtos;
-using udemy_vega_aspnetcore_spa.Models;
 using udemy_vega_aspnetcore_spa.Persistance;
 
 namespace udemy_vega_aspnetcore_spa.Controllers
 {
-  public class MakesController : Controller
+  public class FeaturesController : Controller
   {
-    private readonly UdemyVegaDbContext context;
     private readonly IMapper mapper;
+    private readonly UdemyVegaDbContext context;
 
-    public MakesController(UdemyVegaDbContext context, IMapper mapper)
+    public FeaturesController(UdemyVegaDbContext context, IMapper mapper)
     {
       this.context = context;
       this.mapper = mapper;
     }
 
-    [HttpGet("/api/makes")]
-    public async Task<IEnumerable<MakeApiDto>> GetMakes()
+    [HttpGet("api/features")]
+    public async Task<IEnumerable<FeatureApiDto>> GetFeatures()
     {
-      var makes = await context.Makes.Include(m => m.Models).ToListAsync();
-      return mapper.Map<List<MakeApiDto>>(makes);
+      var features = await context.Features.ToListAsync();
+      return mapper.Map<List<FeatureApiDto>>(features);
     }
   }
 }

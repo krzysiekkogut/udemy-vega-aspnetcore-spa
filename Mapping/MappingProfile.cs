@@ -10,6 +10,7 @@ namespace udemy_vega_aspnetcore_spa.Mapping
     {
       CreateMap<Make, MakeApiDto>();
       CreateMap<Model, ModelApiDto>();
+      CreateMap<Feature, FeatureApiDto>();
     }
   }
 }
