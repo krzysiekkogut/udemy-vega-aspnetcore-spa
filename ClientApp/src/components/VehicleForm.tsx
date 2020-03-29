@@ -1,14 +1,17 @@
 import * as React from 'react';
 import { Make } from '../models/make';
+import { Feature } from '../models/feature';
 
 interface VehicleFormState {
   makes: Make[];
-  selectedMake?: Make
+  features: Feature[];
+  selectedMake?: Make;
 }
 
 class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
   state: VehicleFormState = {
-    makes: []
+    makes: [],
+    features: [],
   }
 
   constructor(props: {}) {
@@ -18,11 +21,8 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
   }
 
   async componentDidMount() {
-    const makesResponse = await fetch('/api/makes');
-    const makes = await makesResponse.json();
-    this.setState({
-      makes
-    });
+    await this.fetchMakes();
+    await this.fetchFeatures();
   }
 
   public render() {
@@ -53,9 +53,37 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
               }
             </select>
           </div>
+
+          <h2>Features</h2>
+          {
+            this.state.features.map(feature => (
+              <div key={feature.id} className="form-group form-check">
+                <input className="form-check-input" type="checkbox" id={`${feature.id}`} />
+                <label className="form-check-label" htmlFor={`${feature.id}`}>
+                  {feature.name}
+                </label>
+              </div>
+            ))
+          }
         </form>
       </React.Fragment>
     );
+  }
+
+  private async fetchMakes() {
+    const makesResponse = await fetch('/api/makes');
+    const makes = await makesResponse.json();
+    this.setState({
+      makes
+    });
+  }
+
+  private async fetchFeatures() {
+    const featuresResponse = await fetch('/api/features');
+    const features = await featuresResponse.json();
+    this.setState({
+      features
+    });
   }
 
   private onMakeChanged(changeEvent: React.SyntheticEvent<HTMLSelectElement>) {
