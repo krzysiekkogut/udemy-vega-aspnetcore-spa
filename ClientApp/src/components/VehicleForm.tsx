@@ -3,11 +3,18 @@ import { Make } from '../models/make';
 
 interface VehicleFormState {
   makes: Make[];
+  selectedMake?: Make
 }
 
 class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
   state: VehicleFormState = {
     makes: []
+  }
+
+  constructor(props: {}) {
+    super(props);
+
+    this.onMakeChanged = this.onMakeChanged.bind(this);
   }
 
   async componentDidMount() {
@@ -16,7 +23,6 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
     this.setState({
       makes
     });
-    console.log(makes);
   }
 
   public render() {
@@ -26,19 +32,37 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
         <form>
           <div className="form-group">
             <label htmlFor="make">Make</label>
-            <select id="make" className="form-control">
+            <select id="make" className="form-control" onChange={this.onMakeChanged}>
               <option value=""></option>
-              {this.state.makes.map((make: Make) => (<option key={make.id} value={make.id}>{make.name}</option>))}
+              {
+                this.state.makes.map((make: Make) => (
+                  <option key={make.id} value={make.id}>{make.name}</option>
+                ))
+              }
             </select>
           </div>
 
           <div className="form-group">
             <label htmlFor="model">Model</label>
-            <select id="model" className="form-control"></select>
+            <select id="model" className="form-control">
+              <option value=""></option>
+              {
+                this.state.selectedMake && this.state.selectedMake.models.map(model => (
+                  <option key={model.id} value={model.id}>{model.name}</option>
+                ))
+              }
+            </select>
           </div>
         </form>
       </React.Fragment>
     );
+  }
+
+  private onMakeChanged(changeEvent: React.SyntheticEvent<HTMLSelectElement>) {
+    const selectedMake = this.state.makes.find(
+      make => make.id === parseInt(changeEvent.currentTarget.value, 10)
+    );
+    this.setState({ selectedMake });
   }
 }
 
