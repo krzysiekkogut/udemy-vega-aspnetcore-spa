@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace udemy_vega_aspnetcore_spa.ApiDtos
 {
@@ -11,6 +12,7 @@ namespace udemy_vega_aspnetcore_spa.ApiDtos
 
     public bool IsRegistered { get; set; }
 
+    [Required]
     public ContactApiDto Contact { get; set; }
 
     public ICollection<int> Features { get; set; }

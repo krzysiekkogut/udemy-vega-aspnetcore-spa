@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using udemy_vega_aspnetcore_spa.ApiDtos;
 using udemy_vega_aspnetcore_spa.Models;
 using udemy_vega_aspnetcore_spa.Persistance;
@@ -23,9 +24,39 @@ namespace udemy_vega_aspnetcore_spa.Controllers
     [HttpPost]
     public async Task<IActionResult> CreateVehicle([FromBody] VehicleApiDto vehicleApiDto)
     {
+      if (!ModelState.IsValid)
+      {
+        return BadRequest(ModelState);
+      }
+
+      // Could be removed as only client of API is React App.
+      // It stays, however, to demo custom model validation.
+      var model = await context.Models.FindAsync(vehicleApiDto.ModelId);
+      if (model == null)
+      {
+        ModelState.AddModelError("ModelId", "Invalid model ID");
+        return BadRequest(ModelState);
+      }
+
       var vehicle = mapper.Map<Vehicle>(vehicleApiDto);
       vehicle.LastUpdate = DateTime.UtcNow;
       await context.Vehicles.AddAsync(vehicle);
+      await context.SaveChangesAsync();
+      var vehicleResponse = mapper.Map<VehicleApiDto>(vehicle);
+      return Ok(vehicleResponse);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateVehicle(int id, [FromBody] VehicleApiDto vehicleApiDto)
+    {
+      if (!ModelState.IsValid)
+      {
+        return BadRequest(ModelState);
+      }
+
+      var vehicle = await context.Vehicles.Include(v => v.Features).SingleOrDefaultAsync(v => v.Id == id);
+      mapper.Map<VehicleApiDto, Vehicle>(vehicleApiDto, vehicle);
+      vehicle.LastUpdate = DateTime.UtcNow;
       await context.SaveChangesAsync();
       var vehicleResponse = mapper.Map<VehicleApiDto>(vehicle);
       return Ok(vehicleResponse);
