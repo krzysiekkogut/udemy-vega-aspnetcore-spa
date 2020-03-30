@@ -1,35 +1,26 @@
 import * as React from 'react';
 import { Make } from '../models/make';
 import { Feature } from '../models/feature';
-
-interface IsSelected {
-  isSelected: boolean
-}
+import { Vehicle, getEmptyVehicle } from '../models/vehicle';
 
 interface VehicleFormState {
   makes: Make[];
-  features: Array<Feature & IsSelected>;
-  selectedMake?: Make;
-  isRegistered: boolean;
-  contactName: string;
-  contactPhone: string;
-  contactEmail: string;
+  features: Feature[];
+  vehicle: Vehicle;
 }
 
 class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
   state: VehicleFormState = {
     makes: [],
     features: [],
-    isRegistered: true,
-    contactName: '',
-    contactPhone: '',
-    contactEmail: '',
+    vehicle: getEmptyVehicle()
   }
 
   constructor(props: {}) {
     super(props);
 
     this.onMakeChanged = this.onMakeChanged.bind(this);
+    this.onModelChanged = this.onModelChanged.bind(this);
     this.onIsRegisteredChanged = this.onIsRegisteredChanged.bind(this);
     this.onNameChange = this.onNameChange.bind(this);
     this.onPhoneChange = this.onPhoneChange.bind(this);
@@ -48,7 +39,7 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
         <form>
           <div className="form-group">
             <label htmlFor="make">Make</label>
-            <select id="make" className="form-control" onChange={this.onMakeChanged} value={this.state.selectedMake && this.state.selectedMake.id}>
+            <select id="make" className="form-control" onChange={this.onMakeChanged} value={this.state.vehicle.makeId}>
               <option value=""></option>
               {
                 this.state.makes.map((make: Make) => (
@@ -60,23 +51,26 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
 
           <div className="form-group">
             <label htmlFor="model">Model</label>
-            <select id="model" className="form-control">
+            <select id="model" className="form-control" onChange={this.onModelChanged} value={this.state.vehicle.modelId}>
               <option value=""></option>
               {
-                this.state.selectedMake && this.state.selectedMake.models.map(model => (
-                  <option key={model.id} value={model.id}>{model.name}</option>
-                ))
+                this.state.vehicle.makeId &&
+                this.state.makes
+                  .find(make => make.id === this.state.vehicle.makeId)!.models
+                  .map(model => (
+                    <option key={model.id} value={model.id}>{model.name}</option>
+                  ))
               }
             </select>
           </div>
 
           <p>Is this vehicle registered?</p>
           <div className="form-group form-check">
-            <input className="form-check-input" type="radio" id="registered_yes" checked={this.state.isRegistered} onChange={this.onIsRegisteredChanged} value="true" />
+            <input className="form-check-input" type="radio" id="registered_yes" checked={this.state.vehicle.isRegistered} onChange={this.onIsRegisteredChanged} />
             <label className="form-check-label" htmlFor="registered_yes">Yes</label>
           </div>
           <div className="form-group form-check">
-            <input className="form-check-input" type="radio" id="registered_no" checked={!this.state.isRegistered} onChange={this.onIsRegisteredChanged} value="false" />
+            <input className="form-check-input" type="radio" id="registered_no" checked={!this.state.vehicle.isRegistered} onChange={this.onIsRegisteredChanged} />
             <label className="form-check-label" htmlFor="registered_no">No</label>
           </div>
 
@@ -84,7 +78,10 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
           {
             this.state.features.map(feature => (
               <div key={feature.id} className="form-group form-check">
-                <input className="form-check-input" type="checkbox" id={`${feature.id}`} checked={feature.isSelected} onChange={() => this.onFeatureSelected(feature)} />
+                <input className="form-check-input" type="checkbox" id={`${feature.id}`}
+                  checked={this.isFeatureSelected(feature)}
+                  onChange={() => this.onFeatureSelected(feature.id)}
+                />
                 <label className="form-check-label" htmlFor={`${feature.id}`}>
                   {feature.name}
                 </label>
@@ -95,15 +92,15 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
           <h2>Contact</h2>
           <div className="form-group">
             <label htmlFor="contactName">Name</label>
-            <input className="form-control" id="contactName" value={this.state.contactName} onChange={this.onNameChange}></input>
+            <input className="form-control" id="contactName" value={this.state.vehicle.contact.name} onChange={this.onNameChange}></input>
           </div>
           <div className="form-group">
             <label htmlFor="contactPhone">Phone</label>
-            <input className="form-control" id="contactPhone" value={this.state.contactPhone} onChange={this.onPhoneChange}></input>
+            <input className="form-control" id="contactPhone" value={this.state.vehicle.contact.phone} onChange={this.onPhoneChange}></input>
           </div>
           <div className="form-group">
             <label htmlFor="contactEmail">Email</label>
-            <input className="form-control" id="contactEmail" value={this.state.contactEmail} onChange={this.onEmailChange}></input>
+            <input className="form-control" id="contactEmail" value={this.state.vehicle.contact.email} onChange={this.onEmailChange}></input>
           </div>
 
           <button className="btn btn-primary">Save</button>
@@ -129,35 +126,97 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
   }
 
   private onMakeChanged(event: React.SyntheticEvent<HTMLSelectElement>) {
-    const selectedMake = this.state.makes.find(
-      make => make.id === parseInt(event.currentTarget.value, 10)
-    );
-    this.setState({ selectedMake });
+    let makeId: number | undefined = parseInt(event.currentTarget.value, 10);
+    makeId = isNaN(makeId) ? undefined : makeId;
+    this.setState(prevState => ({
+      vehicle: {
+        ...prevState.vehicle,
+        makeId,
+        modelId: undefined
+      }
+    }));
   }
 
-  private onIsRegisteredChanged(event: React.SyntheticEvent<HTMLInputElement>) {
-    this.setState({ isRegistered: event.currentTarget.value === 'true' })
+  private onModelChanged(event: React.SyntheticEvent<HTMLSelectElement>) {
+    let modelId: number | undefined = parseInt(event.currentTarget.value, 10);
+    modelId = isNaN(modelId) ? undefined : modelId
+    this.setState(prevState => ({
+      vehicle: {
+        ...prevState.vehicle,
+        modelId
+      }
+    }));
   }
 
-  private onFeatureSelected(feature: Feature & IsSelected) {
-    this.setState((prevState) => ({
-      features: prevState.features.map(f => ({
-        ...f,
-        isSelected: f.id === feature.id ? !f.isSelected : f.isSelected
-      }))
-    }))
+  private onIsRegisteredChanged() {
+    this.setState(prevState => ({
+      vehicle: {
+        ...prevState.vehicle,
+        isRegistered: !prevState.vehicle.isRegistered
+      }
+    }));
+  }
+
+  private onFeatureSelected(featureId: number) {
+    this.setState(prevState => {
+      const features = [...prevState.vehicle.features];
+      if (features.includes(featureId)) {
+        const index = features.indexOf(featureId);
+        features.splice(index, 1);
+      } else {
+        features.push(featureId);
+      }
+
+      return ({
+        vehicle: {
+          ...prevState.vehicle,
+          features
+        }
+      })
+    })
   }
 
   private onNameChange(event: React.SyntheticEvent<HTMLInputElement>) {
-    this.setState({ contactName: event.currentTarget.value });
+    const name = event.currentTarget.value;
+    this.setState(prevState => ({
+      vehicle: {
+        ...prevState.vehicle,
+        contact: {
+          ...prevState.vehicle.contact,
+          name
+        }
+      }
+    }));
   }
 
   private onPhoneChange(event: React.SyntheticEvent<HTMLInputElement>) {
-    this.setState({ contactPhone: event.currentTarget.value });
+    const phone = event.currentTarget.value;
+    this.setState(prevState => ({
+      vehicle: {
+        ...prevState.vehicle,
+        contact: {
+          ...prevState.vehicle.contact,
+          phone
+        }
+      }
+    }));
   }
 
   private onEmailChange(event: React.SyntheticEvent<HTMLInputElement>) {
-    this.setState({ contactEmail: event.currentTarget.value });
+    const email = event.currentTarget.value;
+    this.setState(prevState => ({
+      vehicle: {
+        ...prevState.vehicle,
+        contact: {
+          ...prevState.vehicle.contact,
+          email
+        }
+      }
+    }));
+  }
+
+  private isFeatureSelected(feature: Feature): boolean {
+    return this.state.vehicle.features.includes(feature.id);
   }
 }
 
