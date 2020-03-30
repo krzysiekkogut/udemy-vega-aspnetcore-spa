@@ -11,15 +11,18 @@ namespace udemy_vega_aspnetcore_spa.Controllers
   [Route("/api/vehicles")]
   public class VehiclesController : Controller
   {
-    private readonly UdemyVegaDbContext context;
+    private readonly IUnitOfWork unitOfWork;
     private readonly IMapper mapper;
     private readonly IVehicleRepository repository;
 
-    public VehiclesController(UdemyVegaDbContext context, IMapper mapper, IVehicleRepository repository)
+    public VehiclesController(
+      IMapper mapper,
+      IVehicleRepository repository,
+      IUnitOfWork unitOfWork)
     {
-      this.context = context;
       this.mapper = mapper;
       this.repository = repository;
+      this.unitOfWork = unitOfWork;
     }
 
     [HttpPost]
@@ -33,7 +36,7 @@ namespace udemy_vega_aspnetcore_spa.Controllers
       var vehicle = mapper.Map<Vehicle>(saveVehicleApiDto);
       vehicle.LastUpdate = DateTime.UtcNow;
       await repository.AddAsync(vehicle);
-      await context.SaveChangesAsync();
+      await unitOfWork.CompleteAsync();
 
       vehicle = await repository.GetAsync(vehicle.Id);
 
@@ -57,7 +60,7 @@ namespace udemy_vega_aspnetcore_spa.Controllers
 
       mapper.Map<SaveVehicleApiDto, Vehicle>(saveVehicleApiDto, vehicle);
       vehicle.LastUpdate = DateTime.UtcNow;
-      await context.SaveChangesAsync();
+      await unitOfWork.CompleteAsync();
 
       vehicle = await repository.GetAsync(id);
       var vehicleResponse = mapper.Map<VehicleApiDto>(vehicle);
@@ -74,7 +77,7 @@ namespace udemy_vega_aspnetcore_spa.Controllers
       }
 
       repository.Remove(vehicle);
-      await context.SaveChangesAsync();
+      await unitOfWork.CompleteAsync();
       return Ok(id);
     }
 

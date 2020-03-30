@@ -31,9 +31,9 @@ namespace udemy_vega_aspnetcore_spa
         configuration.RootPath = "ClientApp/build";
       });
 
-      services.AddDbContext<UdemyVegaDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:Default"]));
       services.AddAutoMapper(typeof(MappingProfile));
-
+      services.AddDbContext<UdemyVegaDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:Default"]));
+      services.AddScoped<IUnitOfWork, UnitOfWork>();
       services.AddScoped<IVehicleRepository, VehicleRepository>();
     }
 
