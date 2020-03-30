@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using udemy_vega_aspnetcore_spa.ApiDtos;
@@ -11,49 +10,54 @@ namespace udemy_vega_aspnetcore_spa.Mapping
     public MappingProfile()
     {
       // Domain -> API
+      CreateMap<Make, SimpleMakeApiDto>();
       CreateMap<Make, MakeApiDto>();
       CreateMap<Model, ModelApiDto>();
       CreateMap<Feature, FeatureApiDto>();
       CreateMap<Vehicle, VehicleApiDto>()
         .ForMember(
-          vApiDto => vApiDto.Contact,
+          dto => dto.Make,
+          opt => opt.MapFrom(v => v.Model.Make)
+        )
+        .ForMember(
+          dto => dto.Contact,
           opt => opt.MapFrom(
             v => new ContactApiDto
             {
               Name = v.ContactName,
               Phone = v.ContactPhone,
               Email = v.ContactEmail
-            }
-            )
+            })
           )
-          .ForMember(
-            vApiDto => vApiDto.Features,
-            opt => opt.MapFrom(v => v.Features.Select(f => f.FeatureId))
-          );
+        .ForMember(
+          dto => dto.Features,
+          opt => opt.MapFrom(
+            v => v.Features.Select(vf => new FeatureApiDto { Id = vf.Feature.Id, Name = vf.Feature.Name }))
+        );
 
       // API => Domain
-      CreateMap<VehicleApiDto, Vehicle>()
+      CreateMap<SaveVehicleApiDto, Vehicle>()
         .ForMember(v => v.Id, opt => opt.Ignore())
-        .ForMember(v => v.ContactName, opt => opt.MapFrom(vApiDto => vApiDto.Contact.Name))
-        .ForMember(v => v.ContactPhone, opt => opt.MapFrom(vApiDto => vApiDto.Contact.Phone))
-        .ForMember(v => v.ContactEmail, opt => opt.MapFrom(vApiDto => vApiDto.Contact.Email))
+        .ForMember(v => v.ContactName, opt => opt.MapFrom(dto => dto.Contact.Name))
+        .ForMember(v => v.ContactPhone, opt => opt.MapFrom(dto => dto.Contact.Phone))
+        .ForMember(v => v.ContactEmail, opt => opt.MapFrom(dto => dto.Contact.Email))
         .ForMember(v => v.Features, opt => opt.Ignore())
-        .AfterMap((vApiDto, v) =>
+        .AfterMap((dto, v) =>
         {
           // Remove unselected features
           var removedFeatures = v.Features
-            .Where(f => !vApiDto.Features.Contains(f.FeatureId))
-            .ToList();
+          .Where(f => !dto.Features.Contains(f.FeatureId))
+          .ToList();
           foreach (var f in removedFeatures)
           {
             v.Features.Remove(f);
           }
 
           // Add selected features
-          var addedFeatures = vApiDto.Features
-            .Where(id => !v.Features.Any(f => f.FeatureId == id))
-            .Select(id => new VehicleFeature { FeatureId = id })
-            .ToList();
+          var addedFeatures = dto.Features
+          .Where(id => !v.Features.Any(f => f.FeatureId == id))
+          .Select(id => new VehicleFeature { FeatureId = id })
+          .ToList();
           foreach (var f in addedFeatures)
           {
             v.Features.Add(f);

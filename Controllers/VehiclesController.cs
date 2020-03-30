@@ -22,7 +22,7 @@ namespace udemy_vega_aspnetcore_spa.Controllers
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateVehicle([FromBody] VehicleApiDto vehicleApiDto)
+    public async Task<IActionResult> CreateVehicle([FromBody] SaveVehicleApiDto saveVehicleApiDto)
     {
       if (!ModelState.IsValid)
       {
@@ -31,39 +31,58 @@ namespace udemy_vega_aspnetcore_spa.Controllers
 
       // Could be removed as only client of API is React App.
       // It stays, however, to demo custom model validation.
-      var model = await context.Models.FindAsync(vehicleApiDto.ModelId);
+      var model = await context.Models.FindAsync(saveVehicleApiDto.ModelId);
       if (model == null)
       {
         ModelState.AddModelError("ModelId", "Invalid model ID");
         return BadRequest(ModelState);
       }
 
-      var vehicle = mapper.Map<Vehicle>(vehicleApiDto);
+      var vehicle = mapper.Map<Vehicle>(saveVehicleApiDto);
       vehicle.LastUpdate = DateTime.UtcNow;
       await context.Vehicles.AddAsync(vehicle);
       await context.SaveChangesAsync();
+
+      vehicle = await context.Vehicles
+        .Include(v => v.Features)
+        .ThenInclude(vf => vf.Feature)
+        .Include(v => v.Model)
+        .ThenInclude(m => m.Make)
+        .SingleOrDefaultAsync(v => v.Id == vehicle.Id);
+
       var vehicleResponse = mapper.Map<VehicleApiDto>(vehicle);
       return Ok(vehicleResponse);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateVehicle(int id, [FromBody] VehicleApiDto vehicleApiDto)
+    public async Task<IActionResult> UpdateVehicle(int id, [FromBody] SaveVehicleApiDto saveVehicleApiDto)
     {
       if (!ModelState.IsValid)
       {
         return BadRequest(ModelState);
       }
 
-      var vehicle = await context.Vehicles.Include(v => v.Features).SingleOrDefaultAsync(v => v.Id == id);
+      var vehicle = await context.Vehicles
+        .Include(v => v.Features)
+        .ThenInclude(vf => vf.Feature)
+        .Include(v => v.Model)
+        .ThenInclude(m => m.Make)
+        .SingleOrDefaultAsync(v => v.Id == id);
 
       if (vehicle == null)
       {
         return NotFound();
       }
 
-      mapper.Map<VehicleApiDto, Vehicle>(vehicleApiDto, vehicle);
+      mapper.Map<SaveVehicleApiDto, Vehicle>(saveVehicleApiDto, vehicle);
       vehicle.LastUpdate = DateTime.UtcNow;
       await context.SaveChangesAsync();
+      vehicle = await context.Vehicles
+        .Include(v => v.Features)
+        .ThenInclude(vf => vf.Feature)
+        .Include(v => v.Model)
+        .ThenInclude(m => m.Make)
+        .SingleOrDefaultAsync(v => v.Id == id);
       var vehicleResponse = mapper.Map<VehicleApiDto>(vehicle);
       return Ok(vehicleResponse);
     }
@@ -85,7 +104,13 @@ namespace udemy_vega_aspnetcore_spa.Controllers
     [HttpGet("{id}")]
     public async Task<IActionResult> GetVehicle(int id)
     {
-      var vehicle = await context.Vehicles.Include(v => v.Features).SingleOrDefaultAsync(v => v.Id == id);
+      var vehicle = await context.Vehicles
+        .Include(v => v.Features)
+        .ThenInclude(vf => vf.Feature)
+        .Include(v => v.Model)
+        .ThenInclude(m => m.Make)
+        .SingleOrDefaultAsync(v => v.Id == id);
+
       if (vehicle == null)
       {
         return NotFound();
