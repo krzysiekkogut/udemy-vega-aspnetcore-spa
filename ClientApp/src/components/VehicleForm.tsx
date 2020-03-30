@@ -25,6 +25,7 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
     this.onNameChange = this.onNameChange.bind(this);
     this.onPhoneChange = this.onPhoneChange.bind(this);
     this.onEmailChange = this.onEmailChange.bind(this);
+    this.onVehicleSubmit = this.onVehicleSubmit.bind(this);
   }
 
   async componentDidMount() {
@@ -36,7 +37,7 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
     return (
       <React.Fragment>
         <h1>New Vehicle</h1>
-        <form>
+        <form onSubmit={this.onVehicleSubmit}>
           <div className="form-group">
             <label htmlFor="make">Make</label>
             <select id="make" className="form-control" onChange={this.onMakeChanged} value={this.state.vehicle.makeId}>
@@ -123,6 +124,20 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
     this.setState({
       features: features.map(f => ({ ...f, isSelected: false }))
     });
+  }
+
+  private async onVehicleSubmit(event: React.SyntheticEvent) {
+    event.preventDefault();
+
+    const response = await fetch('/api/vehicles', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(this.state.vehicle)
+    });
+    const createdVehicle = await response.json();
+    console.log(createdVehicle);
   }
 
   private onMakeChanged(event: React.SyntheticEvent<HTMLSelectElement>) {
