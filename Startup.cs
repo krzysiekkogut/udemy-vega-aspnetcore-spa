@@ -33,6 +33,8 @@ namespace udemy_vega_aspnetcore_spa
 
       services.AddDbContext<UdemyVegaDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:Default"]));
       services.AddAutoMapper(typeof(MappingProfile));
+
+      services.AddScoped<IVehicleRepository, VehicleRepository>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
