@@ -7,24 +7,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace udemy_vega_aspnetcore_spa.Pages
+namespace UdemyVega_AspNetCore_Spa.Pages
 {
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public class ErrorModel : PageModel
+  [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+  public class ErrorModel : PageModel
+  {
+    private readonly ILogger<ErrorModel> logger;
+
+    public ErrorModel(ILogger<ErrorModel> _logger)
     {
-        private readonly ILogger<ErrorModel> logger;
-
-        public ErrorModel(ILogger<ErrorModel> _logger)
-        {
-            logger = _logger;
-        }
-        public string RequestId { get; set; }
-
-        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
-
-        public void OnGet()
-        {
-            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-        }
+      logger = _logger;
     }
+    public string RequestId { get; set; }
+
+    public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+
+    public void OnGet()
+    {
+      RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+    }
+  }
 }

@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using udemy_vega_aspnetcore_spa.ApiDtos;
-using udemy_vega_aspnetcore_spa.Models;
-using udemy_vega_aspnetcore_spa.Persistance;
+using UdemyVega_AspNetCore_Spa.Controllers.Resources;
+using UdemyVega_AspNetCore_Spa.Core.Models;
+using UdemyVega_AspNetCore_Spa.Persistance;
 
-namespace udemy_vega_aspnetcore_spa.Controllers
+namespace UdemyVega_AspNetCore_Spa.Controllers
 {
   public class MakesController : Controller
   {
@@ -21,10 +21,10 @@ namespace udemy_vega_aspnetcore_spa.Controllers
     }
 
     [HttpGet("/api/makes")]
-    public async Task<IEnumerable<MakeApiDto>> GetMakes()
+    public async Task<IEnumerable<MakeResource>> GetMakes()
     {
       var makes = await context.Makes.Include(m => m.Models).ToListAsync();
-      return mapper.Map<List<MakeApiDto>>(makes);
+      return mapper.Map<List<MakeResource>>(makes);
     }
   }
 }

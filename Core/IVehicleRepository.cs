@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using udemy_vega_aspnetcore_spa.Models;
+using UdemyVega_AspNetCore_Spa.Core.Models;
 
-namespace udemy_vega_aspnetcore_spa.Persistance
+namespace UdemyVega_AspNetCore_Spa.Core
 {
   public interface IVehicleRepository
   {

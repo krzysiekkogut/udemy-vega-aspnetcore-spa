@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace udemy_vega_aspnetcore_spa.ApiDtos
+namespace UdemyVega_AspNetCore_Spa.Controllers.Resources
 {
-  public class ContactApiDto
+  public class ContactResource
   {
     [Required]
     [StringLength(255)]

@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
+using UdemyVega_AspNetCore_Spa.Core;
 
-namespace udemy_vega_aspnetcore_spa.Persistance
+namespace UdemyVega_AspNetCore_Spa.Persistance
 {
   public class UnitOfWork : IUnitOfWork
   {

@@ -5,163 +5,163 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using udemy_vega_aspnetcore_spa.Persistance;
+using UdemyVega_AspNetCore_Spa.Persistance;
 
-namespace udemy_vega_aspnetcore_spa.Migrations
+namespace UdemyVega_AspNetCore_Spa.Migrations
 {
-    [DbContext(typeof(UdemyVegaDbContext))]
-    [Migration("20200329165300_AddVehicles")]
-    partial class AddVehicles
+  [DbContext(typeof(UdemyVegaDbContext))]
+  [Migration("20200329165300_AddVehicles")]
+  partial class AddVehicles
+  {
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
-        {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.3")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+      modelBuilder
+          .HasAnnotation("ProductVersion", "3.1.3")
+          .HasAnnotation("Relational:MaxIdentifierLength", 128)
+          .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("udemy_vega_aspnetcore_spa.Models.Feature", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+      modelBuilder.Entity("UdemyVega_AspNetCore_Spa.Core.Models.Feature", b =>
+          {
+            b.Property<int>("Id")
+                      .ValueGeneratedOnAdd()
+                      .HasColumnType("int")
+                      .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+            b.Property<string>("Name")
+                      .IsRequired()
+                      .HasColumnType("nvarchar(255)")
+                      .HasMaxLength(255);
 
-                    b.HasKey("Id");
+            b.HasKey("Id");
 
-                    b.ToTable("Features");
-                });
+            b.ToTable("Features");
+          });
 
-            modelBuilder.Entity("udemy_vega_aspnetcore_spa.Models.Make", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+      modelBuilder.Entity("UdemyVega_AspNetCore_Spa.Core.Models.Make", b =>
+          {
+            b.Property<int>("Id")
+                      .ValueGeneratedOnAdd()
+                      .HasColumnType("int")
+                      .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+            b.Property<string>("Name")
+                      .IsRequired()
+                      .HasColumnType("nvarchar(255)")
+                      .HasMaxLength(255);
 
-                    b.HasKey("Id");
+            b.HasKey("Id");
 
-                    b.ToTable("Makes");
-                });
+            b.ToTable("Makes");
+          });
 
-            modelBuilder.Entity("udemy_vega_aspnetcore_spa.Models.Model", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+      modelBuilder.Entity("UdemyVega_AspNetCore_Spa.Core.Models.Model", b =>
+          {
+            b.Property<int>("Id")
+                      .ValueGeneratedOnAdd()
+                      .HasColumnType("int")
+                      .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("MakeId")
-                        .HasColumnType("int");
+            b.Property<int>("MakeId")
+                      .HasColumnType("int");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+            b.Property<string>("Name")
+                      .IsRequired()
+                      .HasColumnType("nvarchar(255)")
+                      .HasMaxLength(255);
 
-                    b.HasKey("Id");
+            b.HasKey("Id");
 
-                    b.HasIndex("MakeId");
+            b.HasIndex("MakeId");
 
-                    b.ToTable("Models");
-                });
+            b.ToTable("Models");
+          });
 
-            modelBuilder.Entity("udemy_vega_aspnetcore_spa.Models.Vehicle", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+      modelBuilder.Entity("UdemyVega_AspNetCore_Spa.Core.Models.Vehicle", b =>
+          {
+            b.Property<int>("Id")
+                      .ValueGeneratedOnAdd()
+                      .HasColumnType("int")
+                      .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ContactEmail")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+            b.Property<string>("ContactEmail")
+                      .HasColumnType("nvarchar(255)")
+                      .HasMaxLength(255);
 
-                    b.Property<string>("ContactName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+            b.Property<string>("ContactName")
+                      .IsRequired()
+                      .HasColumnType("nvarchar(255)")
+                      .HasMaxLength(255);
 
-                    b.Property<string>("ContactPhone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+            b.Property<string>("ContactPhone")
+                      .IsRequired()
+                      .HasColumnType("nvarchar(255)")
+                      .HasMaxLength(255);
 
-                    b.Property<bool>("IsRegistered")
-                        .HasColumnType("bit");
+            b.Property<bool>("IsRegistered")
+                      .HasColumnType("bit");
 
-                    b.Property<DateTime>("LastUpdate")
-                        .HasColumnType("datetime2");
+            b.Property<DateTime>("LastUpdate")
+                      .HasColumnType("datetime2");
 
-                    b.Property<int>("ModelId")
-                        .HasColumnType("int");
+            b.Property<int>("ModelId")
+                      .HasColumnType("int");
 
-                    b.HasKey("Id");
+            b.HasKey("Id");
 
-                    b.HasIndex("ModelId");
+            b.HasIndex("ModelId");
 
-                    b.ToTable("Vehicles");
-                });
+            b.ToTable("Vehicles");
+          });
 
-            modelBuilder.Entity("udemy_vega_aspnetcore_spa.Models.VehicleFeature", b =>
-                {
-                    b.Property<int>("VehicleId")
-                        .HasColumnType("int");
+      modelBuilder.Entity("UdemyVega_AspNetCore_Spa.Core.Models.VehicleFeature", b =>
+          {
+            b.Property<int>("VehicleId")
+                      .HasColumnType("int");
 
-                    b.Property<int>("FeatureId")
-                        .HasColumnType("int");
+            b.Property<int>("FeatureId")
+                      .HasColumnType("int");
 
-                    b.HasKey("VehicleId", "FeatureId");
+            b.HasKey("VehicleId", "FeatureId");
 
-                    b.HasIndex("FeatureId");
+            b.HasIndex("FeatureId");
 
-                    b.ToTable("VehicleFeatures");
-                });
+            b.ToTable("VehicleFeatures");
+          });
 
-            modelBuilder.Entity("udemy_vega_aspnetcore_spa.Models.Model", b =>
-                {
-                    b.HasOne("udemy_vega_aspnetcore_spa.Models.Make", "Make")
-                        .WithMany("Models")
-                        .HasForeignKey("MakeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+      modelBuilder.Entity("UdemyVega_AspNetCore_Spa.Core.Models.Model", b =>
+          {
+            b.HasOne("UdemyVega_AspNetCore_Spa.Core.Models.Make", "Make")
+                      .WithMany("Models")
+                      .HasForeignKey("MakeId")
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
+          });
 
-            modelBuilder.Entity("udemy_vega_aspnetcore_spa.Models.Vehicle", b =>
-                {
-                    b.HasOne("udemy_vega_aspnetcore_spa.Models.Model", "Model")
-                        .WithMany()
-                        .HasForeignKey("ModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+      modelBuilder.Entity("UdemyVega_AspNetCore_Spa.Core.Models.Vehicle", b =>
+          {
+            b.HasOne("UdemyVega_AspNetCore_Spa.Core.Models.Model", "Model")
+                      .WithMany()
+                      .HasForeignKey("ModelId")
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
+          });
 
-            modelBuilder.Entity("udemy_vega_aspnetcore_spa.Models.VehicleFeature", b =>
-                {
-                    b.HasOne("udemy_vega_aspnetcore_spa.Models.Feature", "Feature")
-                        .WithMany()
-                        .HasForeignKey("FeatureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+      modelBuilder.Entity("UdemyVega_AspNetCore_Spa.Core.Models.VehicleFeature", b =>
+          {
+            b.HasOne("UdemyVega_AspNetCore_Spa.Core.Models.Feature", "Feature")
+                      .WithMany()
+                      .HasForeignKey("FeatureId")
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
 
-                    b.HasOne("udemy_vega_aspnetcore_spa.Models.Vehicle", "Vehicle")
-                        .WithMany("Features")
-                        .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+            b.HasOne("UdemyVega_AspNetCore_Spa.Core.Models.Vehicle", "Vehicle")
+                      .WithMany("Features")
+                      .HasForeignKey("VehicleId")
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
+          });
 #pragma warning restore 612, 618
-        }
     }
+  }
 }

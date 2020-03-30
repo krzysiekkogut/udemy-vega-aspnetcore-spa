@@ -11,7 +11,7 @@
     <IsPackable>false</IsPackable>
     <SpaRoot>ClientApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
-    <RootNamespace>udemy_vega_aspnetcore_spa</RootNamespace>
+    <RootNamespace>UdemyVega_AspNetCore_Spa</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

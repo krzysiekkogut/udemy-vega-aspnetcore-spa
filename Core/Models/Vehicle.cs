@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace udemy_vega_aspnetcore_spa.Models
+namespace UdemyVega_AspNetCore_Spa.Core.Models
 {
   [Table("Vehicles")]
   public class Vehicle

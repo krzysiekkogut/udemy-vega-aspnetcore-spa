@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace udemy_vega_aspnetcore_spa.Models
+namespace UdemyVega_AspNetCore_Spa.Core.Models
 {
   [Table("VehicleFeatures")]
   public class VehicleFeature

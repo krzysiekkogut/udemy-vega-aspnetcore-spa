@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace udemy_vega_aspnetcore_spa.Migrations
+namespace UdemyVega_AspNetCore_Spa.Migrations
 {
   public partial class SeedDatabase : Migration
   {

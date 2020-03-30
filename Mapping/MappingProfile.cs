@@ -1,28 +1,28 @@
 using System.Linq;
 using AutoMapper;
-using udemy_vega_aspnetcore_spa.ApiDtos;
-using udemy_vega_aspnetcore_spa.Models;
+using UdemyVega_AspNetCore_Spa.Controllers.Resources;
+using UdemyVega_AspNetCore_Spa.Core.Models;
 
-namespace udemy_vega_aspnetcore_spa.Mapping
+namespace UdemyVega_AspNetCore_Spa.Mapping
 {
   public class MappingProfile : Profile
   {
     public MappingProfile()
     {
       // Domain -> API
-      CreateMap<Make, SimpleMakeApiDto>();
-      CreateMap<Make, MakeApiDto>();
-      CreateMap<Model, ModelApiDto>();
-      CreateMap<Feature, FeatureApiDto>();
-      CreateMap<Vehicle, VehicleApiDto>()
+      CreateMap<Make, SimpleMakeResource>();
+      CreateMap<Make, MakeResource>();
+      CreateMap<Model, ModelResource>();
+      CreateMap<Feature, FeatureResource>();
+      CreateMap<Vehicle, VehicleResource>()
         .ForMember(
-          dto => dto.Make,
+          res => res.Make,
           opt => opt.MapFrom(v => v.Model.Make)
         )
         .ForMember(
-          dto => dto.Contact,
+          res => res.Contact,
           opt => opt.MapFrom(
-            v => new ContactApiDto
+            v => new ContactResource
             {
               Name = v.ContactName,
               Phone = v.ContactPhone,
@@ -30,23 +30,23 @@ namespace udemy_vega_aspnetcore_spa.Mapping
             })
           )
         .ForMember(
-          dto => dto.Features,
+          res => res.Features,
           opt => opt.MapFrom(
-            v => v.Features.Select(vf => new FeatureApiDto { Id = vf.Feature.Id, Name = vf.Feature.Name }))
+            v => v.Features.Select(vf => new FeatureResource { Id = vf.Feature.Id, Name = vf.Feature.Name }))
         );
 
       // API => Domain
-      CreateMap<SaveVehicleApiDto, Vehicle>()
+      CreateMap<SaveVehicleResource, Vehicle>()
         .ForMember(v => v.Id, opt => opt.Ignore())
-        .ForMember(v => v.ContactName, opt => opt.MapFrom(dto => dto.Contact.Name))
-        .ForMember(v => v.ContactPhone, opt => opt.MapFrom(dto => dto.Contact.Phone))
-        .ForMember(v => v.ContactEmail, opt => opt.MapFrom(dto => dto.Contact.Email))
+        .ForMember(v => v.ContactName, opt => opt.MapFrom(res => res.Contact.Name))
+        .ForMember(v => v.ContactPhone, opt => opt.MapFrom(res => res.Contact.Phone))
+        .ForMember(v => v.ContactEmail, opt => opt.MapFrom(res => res.Contact.Email))
         .ForMember(v => v.Features, opt => opt.Ignore())
-        .AfterMap((dto, v) =>
+        .AfterMap((res, v) =>
         {
           // Remove unselected features
           var removedFeatures = v.Features
-          .Where(f => !dto.Features.Contains(f.FeatureId))
+          .Where(f => !res.Features.Contains(f.FeatureId))
           .ToList();
           foreach (var f in removedFeatures)
           {
@@ -54,7 +54,7 @@ namespace udemy_vega_aspnetcore_spa.Mapping
           }
 
           // Add selected features
-          var addedFeatures = dto.Features
+          var addedFeatures = res.Features
           .Where(id => !v.Features.Any(f => f.FeatureId == id))
           .Select(id => new VehicleFeature { FeatureId = id })
           .ToList();

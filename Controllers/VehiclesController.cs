@@ -2,11 +2,11 @@ using System;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using udemy_vega_aspnetcore_spa.ApiDtos;
-using udemy_vega_aspnetcore_spa.Models;
-using udemy_vega_aspnetcore_spa.Persistance;
+using UdemyVega_AspNetCore_Spa.Controllers.Resources;
+using UdemyVega_AspNetCore_Spa.Core;
+using UdemyVega_AspNetCore_Spa.Core.Models;
 
-namespace udemy_vega_aspnetcore_spa.Controllers
+namespace UdemyVega_AspNetCore_Spa.Controllers
 {
   [Route("/api/vehicles")]
   public class VehiclesController : Controller
@@ -26,26 +26,26 @@ namespace udemy_vega_aspnetcore_spa.Controllers
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateVehicle([FromBody] SaveVehicleApiDto saveVehicleApiDto)
+    public async Task<IActionResult> CreateVehicle([FromBody] SaveVehicleResource saveVehicleResource)
     {
       if (!ModelState.IsValid)
       {
         return BadRequest(ModelState);
       }
 
-      var vehicle = mapper.Map<Vehicle>(saveVehicleApiDto);
+      var vehicle = mapper.Map<Vehicle>(saveVehicleResource);
       vehicle.LastUpdate = DateTime.UtcNow;
       await repository.AddAsync(vehicle);
       await unitOfWork.CompleteAsync();
 
       vehicle = await repository.GetAsync(vehicle.Id);
 
-      var vehicleResponse = mapper.Map<VehicleApiDto>(vehicle);
+      var vehicleResponse = mapper.Map<VehicleResource>(vehicle);
       return Ok(vehicleResponse);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateVehicle(int id, [FromBody] SaveVehicleApiDto saveVehicleApiDto)
+    public async Task<IActionResult> UpdateVehicle(int id, [FromBody] SaveVehicleResource saveVehicleResource)
     {
       if (!ModelState.IsValid)
       {
@@ -58,12 +58,12 @@ namespace udemy_vega_aspnetcore_spa.Controllers
         return NotFound();
       }
 
-      mapper.Map<SaveVehicleApiDto, Vehicle>(saveVehicleApiDto, vehicle);
+      mapper.Map<SaveVehicleResource, Vehicle>(saveVehicleResource, vehicle);
       vehicle.LastUpdate = DateTime.UtcNow;
       await unitOfWork.CompleteAsync();
 
       vehicle = await repository.GetAsync(id);
-      var vehicleResponse = mapper.Map<VehicleApiDto>(vehicle);
+      var vehicleResponse = mapper.Map<VehicleResource>(vehicle);
       return Ok(vehicleResponse);
     }
 
@@ -90,7 +90,7 @@ namespace udemy_vega_aspnetcore_spa.Controllers
         return NotFound();
       }
 
-      var vehicleResponse = mapper.Map<VehicleApiDto>(vehicle);
+      var vehicleResponse = mapper.Map<VehicleResource>(vehicle);
       return Ok(vehicleResponse);
     }
   }

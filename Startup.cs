@@ -6,10 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using udemy_vega_aspnetcore_spa.Mapping;
-using udemy_vega_aspnetcore_spa.Persistance;
+using UdemyVega_AspNetCore_Spa.Core;
+using UdemyVega_AspNetCore_Spa.Mapping;
+using UdemyVega_AspNetCore_Spa.Persistance;
 
-namespace udemy_vega_aspnetcore_spa
+namespace UdemyVega_AspNetCore_Spa
 {
   public class Startup
   {

@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using udemy_vega_aspnetcore_spa.ApiDtos;
-using udemy_vega_aspnetcore_spa.Persistance;
+using UdemyVega_AspNetCore_Spa.Controllers.Resources;
+using UdemyVega_AspNetCore_Spa.Persistance;
 
-namespace udemy_vega_aspnetcore_spa.Controllers
+namespace UdemyVega_AspNetCore_Spa.Controllers
 {
   public class FeaturesController : Controller
   {
@@ -20,10 +20,10 @@ namespace udemy_vega_aspnetcore_spa.Controllers
     }
 
     [HttpGet("api/features")]
-    public async Task<IEnumerable<FeatureApiDto>> GetFeatures()
+    public async Task<IEnumerable<FeatureResource>> GetFeatures()
     {
       var features = await context.Features.ToListAsync();
-      return mapper.Map<List<FeatureApiDto>>(features);
+      return mapper.Map<List<FeatureResource>>(features);
     }
   }
 }

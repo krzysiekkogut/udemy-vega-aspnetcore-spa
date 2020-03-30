@@ -1,8 +1,9 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using udemy_vega_aspnetcore_spa.Models;
+using UdemyVega_AspNetCore_Spa.Core;
+using UdemyVega_AspNetCore_Spa.Core.Models;
 
-namespace udemy_vega_aspnetcore_spa.Persistance
+namespace UdemyVega_AspNetCore_Spa.Persistance
 {
   public class VehicleRepository : IVehicleRepository
   {
