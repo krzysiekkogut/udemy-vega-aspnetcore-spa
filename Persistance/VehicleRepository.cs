@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using UdemyVega_AspNetCore_Spa.Core;
@@ -12,6 +13,16 @@ namespace UdemyVega_AspNetCore_Spa.Persistance
     public VehicleRepository(UdemyVegaDbContext context)
     {
       this.context = context;
+    }
+
+    public async Task<ICollection<Vehicle>> GetAllAsync()
+    {
+      return await context.Vehicles
+        .Include(v => v.Features)
+        .ThenInclude(vf => vf.Feature)
+        .Include(v => v.Model)
+        .ThenInclude(m => m.Make)
+        .ToListAsync();
     }
 
     public Task<Vehicle> GetAsync(int id, bool includeRelated = true)

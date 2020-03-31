@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -92,6 +93,14 @@ namespace UdemyVega_AspNetCore_Spa.Controllers
 
       var vehicleResponse = mapper.Map<VehicleResource>(vehicle);
       return Ok(vehicleResponse);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetVehicles()
+    {
+      var vehicles = await repository.GetAllAsync();
+      var vehiclesResponse = mapper.Map<ICollection<VehicleResource>>(vehicles);
+      return Ok(vehiclesResponse);
     }
   }
 }
