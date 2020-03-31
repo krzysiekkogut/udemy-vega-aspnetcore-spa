@@ -1,3 +1,5 @@
+import { faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Vehicle } from '../models/vehicle';
@@ -93,10 +95,34 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
         <table className="table">
           <thead>
             <tr>
-              <th onClick={() => this.onQueryChanged('id')}>Id</th>
-              <th onClick={() => this.onQueryChanged('make')}>Make</th>
-              <th onClick={() => this.onQueryChanged('model')}>Model</th>
-              <th onClick={() => this.onQueryChanged('contactName')}>Contact Name</th>
+              <th onClick={() => this.onSortChanged('id')}>
+                Id&nbsp;
+                {
+                  this.state.query.sortBy === 'id' &&
+                  <FontAwesomeIcon icon={this.state.query.isSortDescending ? faSortDown : faSortUp} />
+                }
+              </th>
+              <th onClick={() => this.onSortChanged('make')}>
+                Make&nbsp;
+                {
+                  this.state.query.sortBy === 'make' &&
+                  <FontAwesomeIcon icon={this.state.query.isSortDescending ? faSortDown : faSortUp} />
+                }
+              </th>
+              <th onClick={() => this.onSortChanged('model')}>
+                Model&nbsp;
+                {
+                  this.state.query.sortBy === 'model' &&
+                  <FontAwesomeIcon icon={this.state.query.isSortDescending ? faSortDown : faSortUp} />
+                }
+              </th>
+              <th onClick={() => this.onSortChanged('contactName')}>
+                Contact Name&nbsp;
+                {
+                  this.state.query.sortBy === 'contactName' &&
+                  <FontAwesomeIcon icon={this.state.query.isSortDescending ? faSortDown : faSortUp} />
+                }
+              </th>
               <th></th>
             </tr>
           </thead>
@@ -179,12 +205,12 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
     }), this.fetchVehicles);
   }
 
-  private onQueryChanged(sortBy: string) {
+  private onSortChanged(sortBy: string) {
     this.setState(prevState => ({
       query: {
         ...prevState.query,
         sortBy,
-        isSortDescending: prevState.query.sortBy === sortBy
+        isSortDescending: prevState.query.sortBy === sortBy ? !prevState.query.isSortDescending : false
       }
     }), this.fetchVehicles)
   }
