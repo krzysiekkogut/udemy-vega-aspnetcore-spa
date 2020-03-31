@@ -5,8 +5,8 @@ import { Model } from './model';
 
 export interface VehicleForSave {
   id?: number
-  makeId?: number;
-  modelId?: number;
+  makeId: number;
+  modelId: number;
   contact: Contact;
   isRegistered: boolean;
   features: number[]
@@ -24,6 +24,8 @@ export interface Vehicle {
 
 export function getEmptyVehicle(): VehicleForSave {
   return {
+    makeId: -1,
+    modelId: -1,
     contact: {
       name: '',
       phone: '',

@@ -85,7 +85,7 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
           <div className="form-group">
             <label htmlFor="make">Make</label>
             <select id="make" className="form-control" onChange={this.onMakeChanged} value={this.state.vehicle.makeId}>
-              <option value=""></option>
+              <option value={-1}></option>
               {
                 this.state.makes.map((make: Make) => (
                   <option key={make.id} value={make.id}>{make.name}</option>
@@ -93,14 +93,14 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
               }
             </select>
           </div>
-          <div className="alert alert-danger" hidden={!this.state.formTouched.makeId || !!this.state.vehicle.makeId}>Please specify the make.</div>
+          <div className="alert alert-danger" hidden={!this.state.formTouched.makeId || this.state.vehicle.makeId >= 0}>Please specify the make.</div>
 
           <div className="form-group">
             <label htmlFor="model">Model</label>
             <select id="model" className="form-control" onChange={this.onModelChanged} value={this.state.vehicle.modelId}>
-              <option value=""></option>
+              <option value={-1}></option>
               {
-                this.state.vehicle.makeId &&
+                this.state.vehicle.makeId >= 0 &&
                 this.state.makes
                   .find(make => make.id === this.state.vehicle.makeId)!.models
                   .map(model => (
@@ -109,7 +109,7 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
               }
             </select>
           </div>
-          <div className="alert alert-danger" hidden={!this.state.formTouched.modelId || !!this.state.vehicle.modelId}>Please specify the model.</div>
+          <div className="alert alert-danger" hidden={!this.state.formTouched.modelId || this.state.vehicle.modelId >= 0}>Please specify the model.</div>
 
           <p>Is this vehicle registered?</p>
           <div className="form-group form-check">
@@ -240,13 +240,12 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
   }
 
   private onMakeChanged(event: React.SyntheticEvent<HTMLSelectElement>) {
-    let makeId: number | undefined = parseInt(event.currentTarget.value, 10);
-    makeId = isNaN(makeId) ? undefined : makeId;
+    const makeId: number = parseInt(event.currentTarget.value, 10);
     this.setState(prevState => ({
       vehicle: {
         ...prevState.vehicle,
         makeId,
-        modelId: undefined
+        modelId: -1
       },
       formTouched: {
         ...prevState.formTouched,
@@ -256,8 +255,7 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
   }
 
   private onModelChanged(event: React.SyntheticEvent<HTMLSelectElement>) {
-    let modelId: number | undefined = parseInt(event.currentTarget.value, 10);
-    modelId = isNaN(modelId) ? undefined : modelId
+    const modelId: number = parseInt(event.currentTarget.value, 10);
     this.setState(prevState => ({
       vehicle: {
         ...prevState.vehicle,
@@ -372,8 +370,8 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
 
   private isFormValid(): boolean {
     return !!(
-      this.state.vehicle.makeId &&
-      this.state.vehicle.modelId &&
+      this.state.vehicle.makeId >= 0 &&
+      this.state.vehicle.modelId >= 0 &&
       this.state.vehicle.contact.name &&
       this.state.vehicle.contact.phone
     );
