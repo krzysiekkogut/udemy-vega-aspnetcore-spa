@@ -3,17 +3,41 @@ import { Make } from '../models/make';
 import { Feature } from '../models/feature';
 import { Vehicle, getEmptyVehicle } from '../models/vehicle';
 
+interface FormTouchedValidation {
+  makeId: boolean;
+  modelId: boolean;
+  contact: {
+    name: boolean;
+    phone: boolean;
+    email: boolean;
+  };
+  isRegistered: boolean;
+  features: boolean;
+}
+
 interface VehicleFormState {
   makes: Make[];
   features: Feature[];
   vehicle: Vehicle;
+  formTouched: FormTouchedValidation;
 }
 
 class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
   state: VehicleFormState = {
     makes: [],
     features: [],
-    vehicle: getEmptyVehicle()
+    vehicle: getEmptyVehicle(),
+    formTouched: {
+      makeId: false,
+      modelId: false,
+      contact: {
+        name: false,
+        phone: false,
+        email: false
+      },
+      isRegistered: false,
+      features: false
+    }
   }
 
   constructor(props: {}) {
@@ -49,6 +73,7 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
               }
             </select>
           </div>
+          <div className="alert alert-danger" hidden={!this.state.formTouched.makeId || !!this.state.vehicle.makeId}>Please specify the make.</div>
 
           <div className="form-group">
             <label htmlFor="model">Model</label>
@@ -64,6 +89,7 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
               }
             </select>
           </div>
+          <div className="alert alert-danger" hidden={!this.state.formTouched.modelId || !!this.state.vehicle.modelId}>Please specify the model.</div>
 
           <p>Is this vehicle registered?</p>
           <div className="form-group form-check">
@@ -95,16 +121,20 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
             <label htmlFor="contactName">Name</label>
             <input className="form-control" id="contactName" value={this.state.vehicle.contact.name} onChange={this.onNameChange}></input>
           </div>
+          <div className="alert alert-danger" hidden={!this.state.formTouched.contact.name || !!this.state.vehicle.contact.name}>Please provide your name.</div>
+
           <div className="form-group">
             <label htmlFor="contactPhone">Phone</label>
             <input className="form-control" id="contactPhone" value={this.state.vehicle.contact.phone} onChange={this.onPhoneChange}></input>
           </div>
+          <div className="alert alert-danger" hidden={!this.state.formTouched.contact.phone || !!this.state.vehicle.contact.phone}>Please provide your phone number.</div>
+
           <div className="form-group">
             <label htmlFor="contactEmail">Email</label>
             <input className="form-control" id="contactEmail" value={this.state.vehicle.contact.email} onChange={this.onEmailChange}></input>
           </div>
 
-          <button className="btn btn-primary">Save</button>
+          <button className="btn btn-primary" disabled={!this.isFormValid()}>Save</button>
         </form>
       </React.Fragment>
     );
@@ -148,6 +178,10 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
         ...prevState.vehicle,
         makeId,
         modelId: undefined
+      },
+      formTouched: {
+        ...prevState.formTouched,
+        makeId: true
       }
     }));
   }
@@ -159,6 +193,10 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
       vehicle: {
         ...prevState.vehicle,
         modelId
+      },
+      formTouched: {
+        ...prevState.formTouched,
+        modelId: true
       }
     }));
   }
@@ -168,6 +206,10 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
       vehicle: {
         ...prevState.vehicle,
         isRegistered: !prevState.vehicle.isRegistered
+      },
+      formTouched: {
+        ...prevState.formTouched,
+        isRegistered: true
       }
     }));
   }
@@ -186,6 +228,10 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
         vehicle: {
           ...prevState.vehicle,
           features
+        },
+        formTouched: {
+          ...prevState.formTouched,
+          features: true
         }
       })
     })
@@ -200,6 +246,13 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
           ...prevState.vehicle.contact,
           name
         }
+      },
+      formTouched: {
+        ...prevState.formTouched,
+        contact: {
+          ...prevState.formTouched.contact,
+          name: true
+        }
       }
     }));
   }
@@ -212,6 +265,13 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
         contact: {
           ...prevState.vehicle.contact,
           phone
+        }
+      },
+      formTouched: {
+        ...prevState.formTouched,
+        contact: {
+          ...prevState.formTouched.contact,
+          phone: true
         }
       }
     }));
@@ -226,12 +286,28 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
           ...prevState.vehicle.contact,
           email
         }
+      },
+      formTouched: {
+        ...prevState.formTouched,
+        contact: {
+          ...prevState.formTouched.contact,
+          email: true
+        }
       }
     }));
   }
 
   private isFeatureSelected(feature: Feature): boolean {
     return this.state.vehicle.features.includes(feature.id);
+  }
+
+  private isFormValid(): boolean {
+    return !!(
+      this.state.vehicle.makeId &&
+      this.state.vehicle.modelId &&
+      this.state.vehicle.contact.name &&
+      this.state.vehicle.contact.phone
+    );
   }
 }
 
