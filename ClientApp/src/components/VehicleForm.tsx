@@ -229,9 +229,13 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
 
   private async deleteVehicle() {
     if (window.confirm("Do you really want to delete this vehicle?")) {
-      await fetch(`/api/vehicle/${this.state.vehicle.id}`, { method: 'DELETE' });
-      toast.success('Succesfully deleted a vehicle.');
-      this.props.history.push('/');
+      try {
+        await fetch(`/api/vehicles/${this.state.vehicle.id}`, { method: 'DELETE' });
+        toast.success('Succesfully deleted a vehicle.');
+        this.props.history.push('/');
+      } catch (error) {
+        toast.error('Could not deleted a vehicle.');
+      }
     }
   }
 
