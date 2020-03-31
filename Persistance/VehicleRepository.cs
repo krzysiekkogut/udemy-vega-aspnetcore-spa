@@ -1,8 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using UdemyVega_AspNetCore_Spa.Core;
 using UdemyVega_AspNetCore_Spa.Core.Models;
+using UdemyVega_AspNetCore_Spa.Extensions;
 
 namespace UdemyVega_AspNetCore_Spa.Persistance
 {
@@ -15,14 +19,36 @@ namespace UdemyVega_AspNetCore_Spa.Persistance
       this.context = context;
     }
 
-    public async Task<ICollection<Vehicle>> GetAllAsync()
+    public async Task<ICollection<Vehicle>> GetAllAsync(VehicleQuery queryObj)
     {
-      return await context.Vehicles
+      var query = context.Vehicles
         .Include(v => v.Features)
         .ThenInclude(vf => vf.Feature)
         .Include(v => v.Model)
         .ThenInclude(m => m.Make)
-        .ToListAsync();
+        .AsQueryable();
+
+      if (queryObj.MakeId.HasValue)
+      {
+        query = query.Where(v => v.Model.MakeId == queryObj.MakeId);
+      }
+
+      if (queryObj.ModelId.HasValue)
+      {
+        query = query.Where(v => v.ModelId == queryObj.ModelId);
+      }
+
+      var columnsMap = new Dictionary<string, Expression<Func<Vehicle, object>>>
+      {
+        ["make"] = v => v.Model.Make.Name,
+        ["model"] = v => v.Model.Name,
+        ["contactName"] = v => v.ContactName,
+        ["id"] = v => v.Id
+      };
+
+      query = query.ApplyOrdering(queryObj, columnsMap);
+
+      return await query.ToListAsync();
     }
 
     public Task<Vehicle> GetAsync(int id, bool includeRelated = true)

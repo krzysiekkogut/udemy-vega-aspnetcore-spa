@@ -6,7 +6,7 @@ namespace UdemyVega_AspNetCore_Spa.Core
 {
   public interface IVehicleRepository
   {
-    Task<ICollection<Vehicle>> GetAllAsync();
+    Task<ICollection<Vehicle>> GetAllAsync(VehicleQuery queryObj);
 
     Task<Vehicle> GetAsync(int id, bool includeRelated = true);
     Task AddAsync(Vehicle vehicle);

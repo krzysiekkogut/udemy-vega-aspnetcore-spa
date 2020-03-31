@@ -63,6 +63,7 @@ namespace UdemyVega_AspNetCore_Spa.Mapping
             v.Features.Add(f);
           }
         });
+      CreateMap<VehicleQueryResource, VehicleQuery>();
     }
   }
 }

@@ -96,9 +96,10 @@ namespace UdemyVega_AspNetCore_Spa.Controllers
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetVehicles()
+    public async Task<IActionResult> GetVehicles(VehicleQueryResource filterResource)
     {
-      var vehicles = await repository.GetAllAsync();
+      var filter = mapper.Map<VehicleQuery>(filterResource);
+      var vehicles = await repository.GetAllAsync(filter);
       var vehiclesResponse = mapper.Map<ICollection<VehicleResource>>(vehicles);
       return Ok(vehiclesResponse);
     }

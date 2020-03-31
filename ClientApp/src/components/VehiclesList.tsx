@@ -1,19 +1,40 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-
 import { Vehicle } from '../models/vehicle';
 import { Make } from '../models/make';
+
+import './VehicleList.css';
 
 interface VehicleListState {
   vehicles: Vehicle[];
   makes: Make[];
+  query: {
+    makeId: number;
+    modelId: number;
+    sortBy: string;
+    isSortDescending: boolean;
+  }
 }
 
-class VehiclesList extends React.PureComponent<VehicleListState> {
-  state = {
+class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
+  state: VehicleListState = {
     vehicles: [],
-    makes: []
+    makes: [],
+    query: {
+      makeId: -1,
+      modelId: -1,
+      sortBy: '',
+      isSortDescending: false
+    }
   };
+
+  constructor(props: unknown) {
+    super(props);
+
+    this.onMakeChanged = this.onMakeChanged.bind(this);
+    this.onModelChanged = this.onModelChanged.bind(this);
+    this.resetFiltering = this.resetFiltering.bind(this);
+  }
 
   async componentDidMount() {
     await Promise.all([
@@ -33,107 +54,140 @@ class VehiclesList extends React.PureComponent<VehicleListState> {
             </button>
           </Link>
         </div>
-        {this.state.vehicles.length > 0 ? <VehliclesTable vehicles={this.state.vehicles} makes={this.state.makes} /> : <p>There are not vehicles saved</p>}
+        <div className="card" style={{ marginBottom: 8 }}>
+          <div className="card-body">
+            <div className="form-group">
+              <label htmlFor="make">Make</label>
+              <select
+                id="make" className="form-control"
+                value={this.state.query.makeId}
+                onChange={this.onMakeChanged}
+              >
+                <option value={-1}></option>
+                {
+                  this.state.makes.map(m => (
+                    <option key={m.id} value={m.id}>{m.name}</option>
+                  ))
+                }
+              </select>
+            </div>
+            <div className="form-group">
+              <label htmlFor="model">Model</label>
+              <select
+                id="model" className="form-control"
+                value={this.state.query.modelId}
+                onChange={this.onModelChanged}
+              >
+                <option value={-1}></option>
+                {
+                  this.state.query.makeId >= 0 &&
+                  this.state.makes.find(m => m.id === this.state.query.makeId)!.models.map(m => (
+                    <option key={m.id} value={m.id}>{m.name}</option>
+                  ))
+                }
+              </select>
+            </div>
+            <button className="btn btn-secondary" onClick={this.resetFiltering}>Reset</button>
+          </div>
+        </div>
+        <table className="table">
+          <thead>
+            <tr>
+              <th onClick={() => this.onQueryChanged('id')}>Id</th>
+              <th onClick={() => this.onQueryChanged('make')}>Make</th>
+              <th onClick={() => this.onQueryChanged('model')}>Model</th>
+              <th onClick={() => this.onQueryChanged('contactName')}>Contact Name</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              this.state.vehicles
+                .map(v => (
+                  <tr key={v.id}>
+                    <td>{v.id}</td>
+                    <td>{v.make.name}</td>
+                    <td>{v.model.name}</td>
+                    <td>{v.contact.name}</td>
+                    <td><Link to={`/${v.id}`}>View</Link></td>
+                  </tr>
+                ))
+            }
+          </tbody>
+        </table>
       </div>
     );
   }
 
   private async fetchVehicles() {
-    const response = await fetch('/api/vehicles');
+    let query = this.toQueryString(this.state.query);
+    const response = await fetch('/api/vehicles' + (query ? `?${query}` : ''));
     const vehicles = await response.json();
     this.setState({
       vehicles
     })
   }
 
+  private toQueryString(filter: any): string {
+    const queryParts = [];
+    for (const prop in filter) {
+      if (filter.hasOwnProperty(prop)) {
+        const value = filter[prop];
+        if (value !== null && value !== undefined && value !== -1) {
+          queryParts.push(`${encodeURIComponent(prop)}=${encodeURIComponent(value)}`);
+        }
+      }
+    }
+
+    return queryParts.join('&');
+  }
+
   private async fetchMakes() {
     const makesResponse = await fetch('/api/makes');
     const makes = await makesResponse.json();
-    this.setState({
-      makes
-    });
-  }
-}
-
-const VehliclesTable = ({ vehicles, makes }: { vehicles: Vehicle[], makes: Make[] }) => {
-  const [filter, setFilter] = React.useState<{ makeId: number, modelId: number }>({
-    makeId: -1,
-    modelId: -1
-  });
-
-  const selectedMake = makes.find(m => m.id === filter.makeId);
-
-  let filteredVehicles = vehicles;
-  if (filter.makeId >= 0) {
-    filteredVehicles = filteredVehicles.filter(v => v.make.id === filter.makeId);
+    this.setState({ makes });
   }
 
-  if (filter.modelId >= 0) {
-    filteredVehicles = filteredVehicles.filter(v => v.model.id === filter.modelId);
+  private onMakeChanged(event: React.SyntheticEvent<HTMLSelectElement>) {
+    const makeId: number = parseInt(event.currentTarget.value, 10);
+    this.setState(prevState => ({
+      query: {
+        ...prevState.query,
+        makeId,
+        modelId: -1
+      }
+    }), this.fetchVehicles);
   }
 
-  return (<React.Fragment>
-    <div className="card" style={{ marginBottom: 8 }}>
-      <div className="card-body">
-        <div className="form-group">
-          <label htmlFor="make">Make</label>
-          <select
-            id="make" className="form-control"
-            value={filter.makeId}
-            onChange={(e) => setFilter({ makeId: e.target.value ? parseInt(e.target.value) : -1, modelId: -1 })}
-          >
-            <option value={-1}></option>
-            {
-              makes.map(m => (
-                <option key={m.id} value={m.id}>{m.name}</option>
-              ))
-            }
-          </select>
-        </div>
-        <div className="form-group">
-          <label htmlFor="model">Model</label>
-          <select
-            id="model" className="form-control"
-            value={filter.modelId}
-            onChange={(e) => setFilter({ makeId: filter.makeId, modelId: e.target.value ? parseInt(e.target.value) : -1 })}
-          >
-            <option value={-1}></option>
-            {
-              selectedMake && selectedMake.models.map(m => (
-                <option key={m.id} value={m.id}>{m.name}</option>
-              ))
-            }
-          </select>
-        </div>
-        <button className="btn btn-secondary" onClick={() => setFilter({ makeId: -1, modelId: -1 })}>Reset</button>
-      </div>
-    </div>
-    <table className="table">
-      <thead>
-        <tr>
-          <th>Id</th>
-          <th>Make</th>
-          <th>Model</th>
-          <th>Contact Name</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {
-          filteredVehicles
-            .map(v => (
-              <tr key={v.id}>
-                <td>{v.id}</td>
-                <td>{v.make.name}</td>
-                <td>{v.model.name}</td>
-                <td>{v.contact.name}</td>
-                <td><Link to={`/${v.id}`}>View</Link></td>
-              </tr>
-            ))
-        }
-      </tbody>
-    </table>
-  </React.Fragment>)
+  private onModelChanged(event: React.SyntheticEvent<HTMLSelectElement>) {
+    const modelId: number = parseInt(event.currentTarget.value, 10);
+    this.setState(prevState => ({
+      query: {
+        ...prevState.query,
+        modelId
+      }
+    }), this.fetchVehicles);
+  }
+
+  private resetFiltering() {
+    this.setState(prevState => ({
+      query: {
+        ...prevState.query,
+        makeId: -1,
+        modelId: -1,
+      }
+    }), this.fetchVehicles);
+  }
+
+  private onQueryChanged(sortBy: string) {
+    this.setState(prevState => ({
+      query: {
+        ...prevState.query,
+        sortBy,
+        isSortDescending: prevState.query.sortBy === sortBy
+      }
+    }), this.fetchVehicles)
+  }
 }
 
 export default VehiclesList;
