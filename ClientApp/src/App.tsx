@@ -8,9 +8,9 @@ import VehicleForm from './components/VehicleForm';
 import './custom.css'
 
 export default () => (
-    <Layout>
-        <Route exact path='/' component={Home} />
-        <Route path='/counter' component={Counter} />
-        <Route path='/vehicle/new' component={VehicleForm} />
-    </Layout>
+  <Layout>
+    <Route exact path='/' component={Home} />
+    <Route path='/counter' component={Counter} />
+    <Route path='/vehicle/new' component={VehicleForm} />
+  </Layout>
 );

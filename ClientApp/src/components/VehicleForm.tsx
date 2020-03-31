@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { toast } from 'react-toastify';
 import { Make } from '../models/make';
 import { Feature } from '../models/feature';
 import { Vehicle, getEmptyVehicle } from '../models/vehicle';
@@ -159,15 +160,20 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
   private async onVehicleSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
 
-    const response = await fetch('/api/vehicles', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(this.state.vehicle)
-    });
-    const createdVehicle = await response.json();
-    console.log(createdVehicle);
+    try {
+      const response = await fetch('/api/vehicles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.state.vehicle)
+      });
+      const createdVehicle = await response.json();
+      toast.success('Succesfully saved a vehicle.');
+      console.log(createdVehicle);
+    } catch (e) {
+      toast.error('Unexpected error. Could not save a vehicle.');
+    }
   }
 
   private onMakeChanged(event: React.SyntheticEvent<HTMLSelectElement>) {
