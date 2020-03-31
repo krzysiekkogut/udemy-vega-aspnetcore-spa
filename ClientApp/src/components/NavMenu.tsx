@@ -18,10 +18,7 @@ export default class NavMenu extends React.PureComponent<{}, { isOpen: boolean }
             <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={this.state.isOpen} navbar>
               <ul className="navbar-nav flex-grow">
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/">Home</NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/vehicle/new">New Vehicle</NavLink>
+                  <NavLink tag={Link} className="text-dark" to="/">Vehicles List</NavLink>
                 </NavItem>
               </ul>
             </Collapse>

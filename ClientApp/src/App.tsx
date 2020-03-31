@@ -10,8 +10,8 @@ export default () => (
   <Layout>
     <Switch>
       <Route exact path='/' component={Home} />
-      <Route exact path='/vehicle/new' component={VehicleForm} />
-      <Route path='/vehicle/:id' component={VehicleForm} />
+      <Route exact path='/new' component={VehicleForm} />
+      <Route path='/:id' component={VehicleForm} />
     </Switch>
   </Layout>
 );
