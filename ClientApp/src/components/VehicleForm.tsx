@@ -1,8 +1,9 @@
 import * as React from 'react';
+import { withRouter, RouteComponentProps } from 'react-router';
 import { toast } from 'react-toastify';
 import { Make } from '../models/make';
 import { Feature } from '../models/feature';
-import { Vehicle, getEmptyVehicle } from '../models/vehicle';
+import { VehicleForSave as SaveVehicle, getEmptyVehicle, Vehicle } from '../models/vehicle';
 
 interface FormTouchedValidation {
   makeId: boolean;
@@ -19,11 +20,15 @@ interface FormTouchedValidation {
 interface VehicleFormState {
   makes: Make[];
   features: Feature[];
-  vehicle: Vehicle;
+  vehicle: SaveVehicle;
   formTouched: FormTouchedValidation;
 }
 
-class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
+type VehicleFormProps = RouteComponentProps<{
+  id: string
+}>;
+
+class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState> {
   state: VehicleFormState = {
     makes: [],
     features: [],
@@ -41,7 +46,7 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
     }
   }
 
-  constructor(props: {}) {
+  constructor(props: VehicleFormProps) {
     super(props);
 
     this.onMakeChanged = this.onMakeChanged.bind(this);
@@ -54,8 +59,19 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
   }
 
   async componentDidMount() {
-    await this.fetchMakes();
-    await this.fetchFeatures();
+    const sources = [
+      this.fetchMakes(),
+      this.fetchFeatures()
+    ];
+
+    if (this.props.match.params.id) {
+      const id = parseInt(this.props.match.params.id, 10);
+      if (!isNaN(id)) {
+        sources.push(this.fetchVehicle(id));
+      }
+    }
+
+    await Promise.all(sources);
   }
 
   public render() {
@@ -157,12 +173,38 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
     });
   }
 
+  private async fetchVehicle(id: number) {
+    try {
+      const response = await fetch(`/api/vehicles/${id}`);
+      const vehicle = await response.json();
+      this.setState({
+        vehicle: this.mapVehicleToFormObject(vehicle)
+      })
+    } catch (e) {
+      this.props.history.push('/');
+    }
+  }
+
+  private mapVehicleToFormObject(vehicle: Vehicle): SaveVehicle {
+    return {
+      id: vehicle.id,
+      makeId: vehicle.make.id,
+      modelId: vehicle.model.id,
+      isRegistered: vehicle.isRegistered,
+      contact: { ...vehicle.contact },
+      features: vehicle.features.map(f => f.id)
+    }
+  }
+
   private async onVehicleSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
 
+    const url = '/api/vehicles/' + (this.state.vehicle.id ? `${this.state.vehicle.id}` : '');
+    const method = this.state.vehicle.id ? 'PUT' : 'POST'
+
     try {
-      const response = await fetch('/api/vehicles', {
-        method: 'POST',
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json'
         },
@@ -317,4 +359,4 @@ class VehicleForm extends React.PureComponent<{}, VehicleFormState> {
   }
 }
 
-export default VehicleForm;
+export default withRouter(VehicleForm);
