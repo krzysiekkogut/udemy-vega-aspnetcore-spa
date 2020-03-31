@@ -5,6 +5,8 @@ import { Make } from '../models/make';
 import { Feature } from '../models/feature';
 import { VehicleForSave as SaveVehicle, getEmptyVehicle, Vehicle } from '../models/vehicle';
 
+import './VehicleForm.css';
+
 interface FormTouchedValidation {
   makeId: boolean;
   modelId: boolean;
@@ -56,6 +58,7 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
     this.onPhoneChange = this.onPhoneChange.bind(this);
     this.onEmailChange = this.onEmailChange.bind(this);
     this.onVehicleSubmit = this.onVehicleSubmit.bind(this);
+    this.deleteVehicle = this.deleteVehicle.bind(this);
   }
 
   async componentDidMount() {
@@ -151,7 +154,14 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
             <input className="form-control" id="contactEmail" value={this.state.vehicle.contact.email} onChange={this.onEmailChange}></input>
           </div>
 
-          <button className="btn btn-primary" disabled={!this.isFormValid()}>Save</button>
+          <div className="btn-toolbar">
+            <div className="btn-group">
+              <button className="btn btn-primary" type="submit" disabled={!this.isFormValid()}>Save</button>
+            </div>
+            <div className="btn-group">
+              <button className="btn btn-danger" type="button" hidden={!this.state.vehicle.id} onClick={this.deleteVehicle}>Delete</button>
+            </div>
+          </div>
         </form>
       </React.Fragment>
     );
@@ -203,18 +213,25 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
     const method = this.state.vehicle.id ? 'PUT' : 'POST'
 
     try {
-      const response = await fetch(url, {
+      await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(this.state.vehicle)
       });
-      const createdVehicle = await response.json();
+      this.props.history.push('/');
       toast.success('Succesfully saved a vehicle.');
-      console.log(createdVehicle);
     } catch (e) {
       toast.error('Unexpected error. Could not save a vehicle.');
+    }
+  }
+
+  private async deleteVehicle() {
+    if (window.confirm("Do you really want to delete this vehicle?")) {
+      await fetch(`/api/vehicle/${this.state.vehicle.id}`, { method: 'DELETE' });
+      toast.success('Succesfully deleted a vehicle.');
+      this.props.history.push('/');
     }
   }
 
