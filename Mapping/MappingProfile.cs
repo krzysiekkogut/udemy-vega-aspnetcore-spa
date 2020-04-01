@@ -34,6 +34,7 @@ namespace UdemyVega_AspNetCore_Spa.Mapping
           opt => opt.MapFrom(
             v => v.Features.Select(vf => new FeatureResource { Id = vf.Feature.Id, Name = vf.Feature.Name }))
         );
+      CreateMap(typeof(QueryResult<>), typeof(QueryResultResource<>));
 
       // API => Domain
       CreateMap<SaveVehicleResource, Vehicle>()

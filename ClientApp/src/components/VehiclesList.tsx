@@ -9,24 +9,30 @@ import './VehicleList.css';
 
 interface VehicleListState {
   vehicles: Vehicle[];
+  totalVehiclesCount: number;
   makes: Make[];
   query: {
     makeId: number;
     modelId: number;
     sortBy: string;
     isSortDescending: boolean;
+    page: number;
+    pageSize: number;
   }
 }
 
 class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
   state: VehicleListState = {
     vehicles: [],
+    totalVehiclesCount: 0,
     makes: [],
     query: {
       makeId: -1,
       modelId: -1,
       sortBy: '',
-      isSortDescending: false
+      isSortDescending: false,
+      page: 1,
+      pageSize: 2,
     }
   };
 
@@ -147,6 +153,18 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
             }
           </tbody>
         </table>
+        <div className="btn=group">
+          {
+            [...Array(Math.ceil(this.state.totalVehiclesCount / this.state.query.pageSize)).keys()].map(p => p + 1).map(page => (
+              <button
+                className={`btn ${page === this.state.query.page ? 'btn-primary' : 'btn-light'}`}
+                onClick={() => this.onPageChanged(page)}
+              >
+                {page}
+              </button>
+            ))
+          }
+        </div>
       </div>
     );
   }
@@ -154,8 +172,8 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
   private async fetchVehicles() {
     let query = this.toQueryString(this.state.query);
     const response = await fetch('/api/vehicles' + (query ? `?${query}` : ''));
-    const vehicles = await response.json();
-    this.setState({ vehicles });
+    const result = await response.json();
+    this.setState({ vehicles: result.items, totalVehiclesCount: result.totalCount });
   }
 
   private toQueryString(filter: any): string {
@@ -184,7 +202,8 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
       query: {
         ...prevState.query,
         makeId,
-        modelId: -1
+        modelId: -1,
+        page: 1
       }
     }), this.fetchVehicles);
   }
@@ -194,7 +213,8 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
     this.setState(prevState => ({
       query: {
         ...prevState.query,
-        modelId
+        modelId,
+        page: 1
       }
     }), this.fetchVehicles);
   }
@@ -205,6 +225,7 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
         ...prevState.query,
         makeId: -1,
         modelId: -1,
+        page: 1
       }
     }), this.fetchVehicles);
   }
@@ -215,6 +236,15 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
         ...prevState.query,
         sortBy,
         isSortDescending: prevState.query.sortBy === sortBy ? !prevState.query.isSortDescending : false
+      }
+    }), this.fetchVehicles)
+  }
+
+  private onPageChanged(page: number) {
+    this.setState(prevState => ({
+      query: {
+        ...prevState.query,
+        page
       }
     }), this.fetchVehicles)
   }

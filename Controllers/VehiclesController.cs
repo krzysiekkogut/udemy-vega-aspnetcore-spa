@@ -100,7 +100,7 @@ namespace UdemyVega_AspNetCore_Spa.Controllers
     {
       var filter = mapper.Map<VehicleQuery>(filterResource);
       var vehicles = await repository.GetAllAsync(filter);
-      var vehiclesResponse = mapper.Map<ICollection<VehicleResource>>(vehicles);
+      var vehiclesResponse = mapper.Map<QueryResultResource<VehicleResource>>(vehicles);
       return Ok(vehiclesResponse);
     }
   }

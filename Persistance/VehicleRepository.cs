@@ -19,8 +19,9 @@ namespace UdemyVega_AspNetCore_Spa.Persistance
       this.context = context;
     }
 
-    public async Task<ICollection<Vehicle>> GetAllAsync(VehicleQuery queryObj)
+    public async Task<QueryResult<Vehicle>> GetAllAsync(VehicleQuery queryObj)
     {
+      var result = new QueryResult<Vehicle>();
       var query = context.Vehicles
         .Include(v => v.Features)
         .ThenInclude(vf => vf.Feature)
@@ -47,9 +48,11 @@ namespace UdemyVega_AspNetCore_Spa.Persistance
       };
 
       query = query.ApplyOrdering(queryObj, columnsMap);
-      query = query.ApplyPaging(queryObj);
 
-      return await query.ToListAsync();
+      result.TotalCount = await query.CountAsync();
+      query = query.ApplyPaging(queryObj);
+      result.Items = await query.ToListAsync();
+      return result;
     }
 
     public Task<Vehicle> GetAsync(int id, bool includeRelated = true)
