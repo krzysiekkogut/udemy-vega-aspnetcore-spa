@@ -30,6 +30,29 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
     }
   };
 
+  private columns = [
+    {
+      title: 'Id',
+      key: 'id',
+      getColumnValue: (v: Vehicle): any => v.id
+    },
+    {
+      title: 'Make',
+      key: 'make',
+      getColumnValue: (v: Vehicle): any => v.make.name
+    },
+    {
+      title: 'Model',
+      key: 'model',
+      getColumnValue: (v: Vehicle): any => v.model.name
+    },
+    {
+      title: 'Contact Name',
+      key: 'contactName',
+      getColumnValue: (v: Vehicle): any => v.contact.name
+    }
+  ]
+
   constructor(props: unknown) {
     super(props);
 
@@ -95,34 +118,16 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
         <table className="table">
           <thead>
             <tr>
-              <th onClick={() => this.onSortChanged('id')}>
-                Id&nbsp;
-                {
-                  this.state.query.sortBy === 'id' &&
-                  <FontAwesomeIcon icon={this.state.query.isSortDescending ? faSortDown : faSortUp} />
-                }
-              </th>
-              <th onClick={() => this.onSortChanged('make')}>
-                Make&nbsp;
-                {
-                  this.state.query.sortBy === 'make' &&
-                  <FontAwesomeIcon icon={this.state.query.isSortDescending ? faSortDown : faSortUp} />
-                }
-              </th>
-              <th onClick={() => this.onSortChanged('model')}>
-                Model&nbsp;
-                {
-                  this.state.query.sortBy === 'model' &&
-                  <FontAwesomeIcon icon={this.state.query.isSortDescending ? faSortDown : faSortUp} />
-                }
-              </th>
-              <th onClick={() => this.onSortChanged('contactName')}>
-                Contact Name&nbsp;
-                {
-                  this.state.query.sortBy === 'contactName' &&
-                  <FontAwesomeIcon icon={this.state.query.isSortDescending ? faSortDown : faSortUp} />
-                }
-              </th>
+              {
+                this.columns.map(c => (
+                  <th onClick={() => this.onSortChanged(c.key)}>
+                    {c.title}&nbsp;
+                    {
+                      this.state.query.sortBy === c.key &&
+                      <FontAwesomeIcon icon={this.state.query.isSortDescending ? faSortDown : faSortUp} />
+                    }
+                  </th>))
+              }
               <th></th>
             </tr>
           </thead>
@@ -131,10 +136,11 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
               this.state.vehicles
                 .map(v => (
                   <tr key={v.id}>
-                    <td>{v.id}</td>
-                    <td>{v.make.name}</td>
-                    <td>{v.model.name}</td>
-                    <td>{v.contact.name}</td>
+                    {
+                      this.columns.map(c => (
+                        <td>{c.getColumnValue(v)}</td>
+                      ))
+                    }
                     <td><Link to={`/${v.id}`}>View</Link></td>
                   </tr>
                 ))
@@ -149,9 +155,7 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
     let query = this.toQueryString(this.state.query);
     const response = await fetch('/api/vehicles' + (query ? `?${query}` : ''));
     const vehicles = await response.json();
-    this.setState({
-      vehicles
-    })
+    this.setState({ vehicles });
   }
 
   private toQueryString(filter: any): string {
