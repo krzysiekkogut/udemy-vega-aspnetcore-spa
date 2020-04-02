@@ -5,8 +5,6 @@ import { Make } from '../models/make';
 import { Feature } from '../models/feature';
 import { VehicleForSave as SaveVehicle, getEmptyVehicle, Vehicle } from '../models/vehicle';
 
-import './VehicleForm.css';
-
 interface FormTouchedValidation {
   makeId: boolean;
   modelId: boolean;
@@ -191,7 +189,7 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
         vehicle: this.mapVehicleToFormObject(vehicle)
       })
     } catch (e) {
-      this.props.history.push('/');
+      this.props.history.push(`/$id}`);
     }
   }
 
@@ -201,7 +199,11 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
       makeId: vehicle.make.id,
       modelId: vehicle.model.id,
       isRegistered: vehicle.isRegistered,
-      contact: { ...vehicle.contact },
+      contact: {
+        name: vehicle.contact.name || '',
+        phone: vehicle.contact.phone || '',
+        email: vehicle.contact.email || ''
+      },
       features: vehicle.features.map(f => f.id)
     }
   }
@@ -213,15 +215,20 @@ class VehicleForm extends React.PureComponent<VehicleFormProps, VehicleFormState
     const method = this.state.vehicle.id ? 'PUT' : 'POST'
 
     try {
-      await fetch(url, {
+      const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(this.state.vehicle)
       });
-      this.props.history.push('/');
-      toast.success('Succesfully saved a vehicle.');
+      if (response.ok) {
+        const vehicle = await response.json();
+        this.props.history.push(`/${vehicle.id}`);
+        toast.success('Succesfully saved a vehicle.');
+      } else {
+        toast.error('Unexpected error. Could not save a vehicle.');
+      }
     } catch (e) {
       toast.error('Unexpected error. Could not save a vehicle.');
     }

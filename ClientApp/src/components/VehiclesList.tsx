@@ -5,8 +5,6 @@ import { Link } from 'react-router-dom';
 import { Vehicle } from '../models/vehicle';
 import { Make } from '../models/make';
 
-import './VehicleList.css';
-
 interface VehicleListState {
   vehicles: Vehicle[];
   totalVehiclesCount: number;
@@ -32,7 +30,7 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
       sortBy: '',
       isSortDescending: false,
       page: 1,
-      pageSize: 2,
+      pageSize: 4,
     }
   };
 
@@ -126,7 +124,7 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
             <tr>
               {
                 this.columns.map(c => (
-                  <th onClick={() => this.onSortChanged(c.key)}>
+                  <th key={c.key} className="pointer" onClick={() => this.onSortChanged(c.key)}>
                     {c.title}&nbsp;
                     {
                       this.state.query.sortBy === c.key &&
@@ -144,7 +142,7 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
                   <tr key={v.id}>
                     {
                       this.columns.map(c => (
-                        <td>{c.getColumnValue(v)}</td>
+                        <td key={c.key}>{c.getColumnValue(v)}</td>
                       ))
                     }
                     <td><Link to={`/${v.id}`}>View</Link></td>
@@ -159,6 +157,7 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
               <button
                 className={`btn ${page === this.state.query.page ? 'btn-primary' : 'btn-light'}`}
                 onClick={() => this.onPageChanged(page)}
+                key={page}
               >
                 {page}
               </button>
