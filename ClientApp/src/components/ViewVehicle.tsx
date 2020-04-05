@@ -132,7 +132,7 @@ class ViewVehicle extends React.Component<ViewVehicleProps, ViewVehicleState> {
           <div>
             {
               this.state.photos.map(p => (
-                <div style={{ display: 'inline-block' }}>
+                <div key={p.id} style={{ display: 'inline-block' }}>
                   <button
                     className="btn btn-danger" style={{ position: 'absolute' }}
                     onClick={() => this.deleteImage(p.id)}
