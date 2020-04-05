@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UdemyVega_AspNetCore_Spa.Persistance;
 
 namespace UdemyVega_AspNetCore_Spa.Migrations
 {
     [DbContext(typeof(UdemyVegaDbContext))]
-    partial class UdemyVegaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200405104126_AddPhoto")]
+    partial class AddPhoto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

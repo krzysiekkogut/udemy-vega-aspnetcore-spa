@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using UdemyVega_AspNetCore_Spa.Core;
+using UdemyVega_AspNetCore_Spa.Core.Models;
 using UdemyVega_AspNetCore_Spa.Mapping;
 using UdemyVega_AspNetCore_Spa.Persistance;
 
@@ -36,6 +37,8 @@ namespace UdemyVega_AspNetCore_Spa
       services.AddDbContext<UdemyVegaDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:Default"]));
       services.AddScoped<IUnitOfWork, UnitOfWork>();
       services.AddScoped<IVehicleRepository, VehicleRepository>();
+
+      services.Configure<PhotoSettings>(Configuration.GetSection("PhotoSettings"));
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

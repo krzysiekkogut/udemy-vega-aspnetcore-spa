@@ -180,7 +180,7 @@ class VehiclesList extends React.PureComponent<unknown, VehicleListState> {
     for (const prop in filter) {
       if (filter.hasOwnProperty(prop)) {
         const value = filter[prop];
-        if (value !== null && value !== undefined && value !== -1) {
+        if (value !== null && value !== undefined && value !== -1 && value !== '') {
           queryParts.push(`${encodeURIComponent(prop)}=${encodeURIComponent(value)}`);
         }
       }

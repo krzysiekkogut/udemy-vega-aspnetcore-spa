@@ -1,13 +1,12 @@
 {
     "version": "2.0.0",
-    "tasks": [
-        {
+    "tasks": [{
             "label": "build",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/udemy-vega-aspnetcore-spa.csproj",
+                "${workspaceFolder}/UdemyVega_AspNetCore_Spa.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +18,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/udemy-vega-aspnetcore-spa.csproj",
+                "${workspaceFolder}/UdemyVega_AspNetCore_Spa.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -32,7 +31,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/udemy-vega-aspnetcore-spa.csproj",
+                "${workspaceFolder}/UdemyVega_AspNetCore_Spa.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
