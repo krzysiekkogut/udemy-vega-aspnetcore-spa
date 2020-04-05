@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,7 +9,6 @@ using Microsoft.Extensions.Options;
 using UdemyVega_AspNetCore_Spa.Controllers.Resources;
 using UdemyVega_AspNetCore_Spa.Core;
 using UdemyVega_AspNetCore_Spa.Core.Models;
-using FileIO = System.IO.File;
 
 namespace UdemyVega_AspNetCore_Spa.Controllers
 {
@@ -20,23 +18,23 @@ namespace UdemyVega_AspNetCore_Spa.Controllers
     private readonly IWebHostEnvironment host;
     private readonly IVehicleRepository vehicleRepository;
     private readonly IPhotoRepository photoRepository;
-    private readonly IUnitOfWork unitOfWork;
     private readonly IMapper mapper;
+    private readonly IPhotoService photoService;
     private readonly PhotoSettings photoSettings;
 
     public PhotosController(
       IWebHostEnvironment host,
       IVehicleRepository vehicleRepository,
       IPhotoRepository photoRepository,
-      IUnitOfWork unitOfWork,
       IMapper mapper,
+      IPhotoService photoService,
       IOptionsSnapshot<PhotoSettings> options)
     {
       this.host = host;
       this.vehicleRepository = vehicleRepository;
       this.photoRepository = photoRepository;
-      this.unitOfWork = unitOfWork;
       this.mapper = mapper;
+      this.photoService = photoService;
       this.photoSettings = options.Value;
     }
 
@@ -72,29 +70,14 @@ namespace UdemyVega_AspNetCore_Spa.Controllers
       }
 
       var uploadsFolderPath = Path.Combine(host.WebRootPath, "uploads");
-      if (!Directory.Exists(uploadsFolderPath))
-      {
-        Directory.CreateDirectory(uploadsFolderPath);
-      }
-
-      var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-      var filePath = Path.Combine(uploadsFolderPath, fileName);
-
-      using (var stream = new FileStream(filePath, FileMode.CreateNew))
-      {
-        await file.CopyToAsync(stream);
-      }
-
-      var photo = new Photo { FileName = fileName };
-      vehicle.Photos.Add(photo);
-      await unitOfWork.CompleteAsync();
+      var photo = await photoService.UploadPhoto(vehicle, file, uploadsFolderPath);
 
       return Ok(mapper.Map<PhotoResource>(photo));
     }
 
     [HttpDelete]
     [Route("{id}")]
-    public async Task<IActionResult> DeleteImage(int vehicleId, int id)
+    public async Task<IActionResult> DeletePhoto(int vehicleId, int id)
     {
       var photo = await photoRepository.GetPhoto(id);
       if (photo == null)
@@ -103,13 +86,7 @@ namespace UdemyVega_AspNetCore_Spa.Controllers
       }
 
       var uploadsFolderPath = Path.Combine(host.WebRootPath, "uploads");
-      var filePath = Path.Combine(uploadsFolderPath, photo.FileName);
-
-      photoRepository.Remove(photo);
-      await unitOfWork.CompleteAsync();
-
-      FileIO.Delete(filePath);
-
+      await photoService.DeletePhoto(uploadsFolderPath, photo);
       return Ok();
     }
   }

@@ -39,6 +39,9 @@ namespace UdemyVega_AspNetCore_Spa
       services.AddScoped<IVehicleRepository, VehicleRepository>();
       services.AddScoped<IPhotoRepository, PhotoRepository>();
 
+      services.AddTransient<IPhotoService, PhotoService>();
+      services.AddTransient<IPhotoStorage, FileSystemPhotoStorage>();
+
       services.Configure<PhotoSettings>(Configuration.GetSection("PhotoSettings"));
     }
 
