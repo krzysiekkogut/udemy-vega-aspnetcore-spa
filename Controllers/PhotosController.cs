@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using UdemyVega_AspNetCore_Spa.Controllers.Resources;
 using UdemyVega_AspNetCore_Spa.Core;
 using UdemyVega_AspNetCore_Spa.Core.Models;
+using FileIO = System.IO.File;
 
 namespace UdemyVega_AspNetCore_Spa.Controllers
 {
@@ -89,6 +90,27 @@ namespace UdemyVega_AspNetCore_Spa.Controllers
       await unitOfWork.CompleteAsync();
 
       return Ok(mapper.Map<PhotoResource>(photo));
+    }
+
+    [HttpDelete]
+    [Route("{id}")]
+    public async Task<IActionResult> DeleteImage(int vehicleId, int id)
+    {
+      var photo = await photoRepository.GetPhoto(id);
+      if (photo == null)
+      {
+        return NotFound();
+      }
+
+      var uploadsFolderPath = Path.Combine(host.WebRootPath, "uploads");
+      var filePath = Path.Combine(uploadsFolderPath, photo.FileName);
+
+      photoRepository.Remove(photo);
+      await unitOfWork.CompleteAsync();
+
+      FileIO.Delete(filePath);
+
+      return Ok();
     }
   }
 }

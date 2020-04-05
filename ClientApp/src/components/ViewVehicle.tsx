@@ -132,7 +132,15 @@ class ViewVehicle extends React.Component<ViewVehicleProps, ViewVehicleState> {
           <div>
             {
               this.state.photos.map(p => (
-                <img key={p.id} src={`/uploads/${p.fileName}`} width={300} className="img-thumbnail" />
+                <div style={{ display: 'inline-block' }}>
+                  <button
+                    className="btn btn-danger" style={{ position: 'absolute' }}
+                    onClick={() => this.deleteImage(p.id)}
+                  >
+                    <FontAwesomeIcon icon={faTimes} />
+                  </button>
+                  <img src={`/uploads/${p.fileName}`} width={300} className="img-thumbnail" />
+                </div>
               ))
             }
           </div>
@@ -172,8 +180,22 @@ class ViewVehicle extends React.Component<ViewVehicleProps, ViewVehicleState> {
     }
   }
 
-  private onTabChanged(tabSelected: string) {
-    this.setState({ tabSelected });
+  private async deleteImage(imageId: number) {
+    try {
+
+      const response = await fetch(`/api/vehicles/${this.state.vehicle!.id}/photos/${imageId}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        this.setState(prevState => ({
+          photos: prevState.photos.filter(p => p.id !== imageId)
+        }), () => toast.success('Image successfully deleted.'));
+      } else {
+        toast.error('Could not delete an image.')
+      }
+    } catch (error) {
+      toast.error('Could not delete an image.')
+    }
   }
 
   private async uploadPhoto(event: React.SyntheticEvent<HTMLInputElement>) {
@@ -202,6 +224,10 @@ class ViewVehicle extends React.Component<ViewVehicleProps, ViewVehicleState> {
     } catch (e) {
       toast.error('Could not upload an image.');
     }
+  }
+
+  private onTabChanged(tabSelected: string) {
+    this.setState({ tabSelected });
   }
 }
 

@@ -19,5 +19,15 @@ namespace UdemyVega_AspNetCore_Spa.Persistance
     {
       return await context.Photos.Where(p => p.VehicleId == vehicleId).ToListAsync();
     }
+
+    public async Task<Photo> GetPhoto(int id)
+    {
+      return await context.Photos.FindAsync(id);
+    }
+
+    public void Remove(Photo photo)
+    {
+      context.Photos.Remove(photo);
+    }
   }
 }

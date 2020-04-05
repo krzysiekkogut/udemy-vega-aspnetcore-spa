@@ -7,5 +7,7 @@ namespace UdemyVega_AspNetCore_Spa.Core
   public interface IPhotoRepository
   {
     Task<IEnumerable<Photo>> GetPhotos(int vehicleId);
+    Task<Photo> GetPhoto(int id);
+    void Remove(Photo photo);
   }
 }
