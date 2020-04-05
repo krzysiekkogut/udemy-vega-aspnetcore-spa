@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Vehicle } from '../models/vehicle';
+import { Photo } from '../models/photo';
 
 type ViewVehicleProps = RouteComponentProps<{
   id?: string;
@@ -14,24 +15,30 @@ type ViewVehicleProps = RouteComponentProps<{
 interface ViewVehicleState {
   tabSelected: string;
   vehicle?: Vehicle;
+  photos: Photo[];
 }
 
 class ViewVehicle extends React.Component<ViewVehicleProps, ViewVehicleState> {
   state: ViewVehicleState = {
-    tabSelected: 'vehicle'
+    tabSelected: 'vehicle',
+    photos: []
   };
 
   constructor(props: ViewVehicleProps) {
     super(props);
     this.onEditVehicle = this.onEditVehicle.bind(this);
     this.deleteVehicle = this.deleteVehicle.bind(this);
+    this.uploadPhoto = this.uploadPhoto.bind(this);
   }
 
   async componentDidMount() {
     if (this.props.match.params.id) {
       const id = parseInt(this.props.match.params.id, 10);
       if (!isNaN(id)) {
-        await this.fetchVehicle(id);
+        await Promise.all([
+          this.fetchVehicle(id),
+          this.fetchPhotos(id)
+        ]);
       }
     }
   }
@@ -58,10 +65,11 @@ class ViewVehicle extends React.Component<ViewVehicleProps, ViewVehicleState> {
             </button>
           </li>
         </ul>
-        <div hidden={this.state.tabSelected !== 'vehicle'}>
+        <div className="tab-container" hidden={this.state.tabSelected !== 'vehicle'}>
           {
             this.state.vehicle &&
             <React.Fragment>
+              <h2>Data</h2>
               <table className="table">
                 <tbody>
                   <tr>
@@ -118,7 +126,17 @@ class ViewVehicle extends React.Component<ViewVehicleProps, ViewVehicleState> {
             </React.Fragment>
           }
         </div>
-        <div hidden={this.state.tabSelected !== 'photos'}></div>
+        <div className="tab-container" hidden={this.state.tabSelected !== 'photos'}>
+          <h2>Photos</h2>
+          <input type="file" onChange={this.uploadPhoto} />
+          <div>
+            {
+              this.state.photos.map(p => (
+                <img key={p.id} src={`/uploads/${p.fileName}`} width={300} className="img-thumbnail" />
+              ))
+            }
+          </div>
+        </div>
       </React.Fragment>
     );
   }
@@ -130,6 +148,12 @@ class ViewVehicle extends React.Component<ViewVehicleProps, ViewVehicleState> {
     }
     const vehicle = await response.json();
     this.setState({ vehicle });
+  }
+
+  private async fetchPhotos(id: number) {
+    const response = await fetch(`/api/vehicles/${id}/photos`);
+    const photos = await response.json();
+    this.setState({ photos });
   }
 
   private onEditVehicle() {
@@ -150,6 +174,34 @@ class ViewVehicle extends React.Component<ViewVehicleProps, ViewVehicleState> {
 
   private onTabChanged(tabSelected: string) {
     this.setState({ tabSelected });
+  }
+
+  private async uploadPhoto(event: React.SyntheticEvent<HTMLInputElement>) {
+    if ((event.target as HTMLInputElement).files!.length === 0) {
+      return;
+    }
+
+    const fileFormData = new FormData();
+    fileFormData.append('file', (event.target as HTMLInputElement).files![0]);
+    (event.target as HTMLInputElement).value = '';
+
+    try {
+      const response = await fetch(`/api/vehicles/${this.state.vehicle!.id}/photos`, {
+        method: 'POST',
+        body: fileFormData,
+      });
+
+      if (!response.ok) {
+        toast.error(await response.text());
+      } else {
+        const photo = await response.json();
+        this.setState(prevState => ({
+          photos: [...prevState.photos, photo]
+        }))
+      }
+    } catch (e) {
+      toast.error('Could not upload an image.');
+    }
   }
 }
 

@@ -20,3 +20,7 @@ th.pointer {
 td.bold {
   font-weight: bold;
 }
+
+.tab-container {
+  margin-top: 8px;
+}

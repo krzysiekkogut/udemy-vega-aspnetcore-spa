@@ -10,5 +10,7 @@ namespace UdemyVega_AspNetCore_Spa.Core.Models
 
     [Required]
     public string FileName { get; set; }
+
+    public int VehicleId { get; set; }
   }
 }

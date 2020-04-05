@@ -9,6 +9,7 @@ namespace UdemyVega_AspNetCore_Spa.Persistance
     public DbSet<Model> Models { get; set; }
     public DbSet<Feature> Features { get; set; }
     public DbSet<Vehicle> Vehicles { get; set; }
+    public DbSet<Photo> Photos { get; set; }
 
     public UdemyVegaDbContext(DbContextOptions<UdemyVegaDbContext> options)
     : base(options)

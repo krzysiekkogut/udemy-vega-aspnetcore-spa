@@ -37,6 +37,7 @@ namespace UdemyVega_AspNetCore_Spa
       services.AddDbContext<UdemyVegaDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:Default"]));
       services.AddScoped<IUnitOfWork, UnitOfWork>();
       services.AddScoped<IVehicleRepository, VehicleRepository>();
+      services.AddScoped<IPhotoRepository, PhotoRepository>();
 
       services.Configure<PhotoSettings>(Configuration.GetSection("PhotoSettings"));
     }
